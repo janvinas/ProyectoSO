@@ -1,0 +1,7 @@
+Definición de las consultas:
+
+0/
+    Desconectarse del servidor
+1/"Nombre"/"Contraseña"/"Genero"/"Edad"/"Correo"
+    Registrar un nuevo usuario
+2/"Nombre"/"Contraseña"
