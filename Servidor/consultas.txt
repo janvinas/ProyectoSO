@@ -1,7 +1,10 @@
 Definición de las consultas:
 
 0/
-    Desconectarse del servidor
-1/"Nombre"/"Contraseña"/"Genero"/"Edad"/"Correo"
-    Registrar un nuevo usuario
-2/"Nombre"/"Contraseña"
+	Desconectarse del servidor
+1/"Nombre"/"Contraseña"
+	Iniciar sesión
+	Retorna 1 si la contraseña es correcta
+2/"Nombre"/"Contraseña"/"Correo"/"Género"
+	Registrar un nuevo usuario
+	Retorna 1 si se ha creado el usuario satisfactoriamente

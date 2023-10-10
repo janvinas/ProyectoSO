@@ -8,12 +8,21 @@
 #include <stdio.h>
 
 int main(int argc, char *charv[]){
-	int sock_conn, sock_listen, ret;
-	struct sockaddr_in serv_adr;
-	char buff[512];
-	char buff2[512];
+	MYSQL *conn;
+	MYSQL_RES *resultado;
+	MYSQL_ROW row;
+	conn = mysql_init(NULL);
+	if(conn==NULL){
+		printf("Error creant connexió SQL: %u %s\n", mysql_errno(conn), mysql_error(conn));
+		exit(-1);
+	}
+	conn = mysql_real_connect(conn, "localhost", "root", "mysql", "AirportSIM", 0, NULL, 0);
+	if(conn==NULL){
+		printf("Error creant connexió SQL: %u %s\n", mysql_errno(conn), mysql_error(conn));
+		exit(-1);
+	}
 
-		int sock_conn, sock_listen, ret;
+	int sock_conn, sock_listen, ret;
 	struct sockaddr_in serv_adr;
 	char buff[512];
 	char buff2[512];
@@ -59,10 +68,22 @@ int main(int argc, char *charv[]){
 				printf("Cliente desconectado\n");
 				break;
 			}else if(codigo == 1){
-				//TODO añadir codigo para registrar un usuario
-			}
+				char nombre[40];
+				strcpy(nombre, strtok(NULL, "/"));
+				char password[40];
+				strcpy(password, strtok(NULL, "/"));
+				char email[80];
+				strcpy(email, strtok(NULL, "/"));
+				char genero = strtok(NULL, "/")[0];	//el género tiene un único carácter
 
-			//TODO añadir mensaje de login
+				char query[300];
+				sprintf(query, "INSERT INTO Jugador (Usuario, Password, Mail, Genero) VALUES (\'%s\', \'%s\', \'%s\', \'%c\');", nombre, password, email, genero);
+				int result = mysql_query(conn, query);
+				if(result != 0){
+					sprintf(buff2, "-100");
+				}
+			}
+			//TODO añadir mensaje de registro
 
 
 			//imprimeix el buffer al socket i tanca'l
