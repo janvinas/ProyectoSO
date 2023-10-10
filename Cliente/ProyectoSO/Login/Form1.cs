@@ -48,6 +48,7 @@ namespace Login
                 MessageBox.Show("Conectado");
                 login.Enabled = true;
                 signup.Enabled = true;
+                consultasBasicas.Enabled = true;
 
             }
             catch (SocketException ex)
@@ -70,6 +71,9 @@ namespace Login
                 this.BackColor = Color.Gray;
                 server.Shutdown(SocketShutdown.Both);
                 server.Close();
+                login.Enabled = false;
+                signup.Enabled = false;
+                consultasBasicas.Enabled = false;
             }
             else
                 MessageBox.Show("No estas conectado con el servidor");
@@ -91,6 +95,12 @@ namespace Login
             Password=signup.GetPassword();
             Mail = signup.GetMail();
             Genero = signup.GetGenero();
+        }
+
+        private void consultasBasicas_Click(object sender, EventArgs e)
+        {
+            ConsultasBasicas consultasBasicas= new ConsultasBasicas(server);
+            consultasBasicas.ShowDialog();
         }
     }
 }

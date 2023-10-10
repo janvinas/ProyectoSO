@@ -34,6 +34,7 @@
             this.desconectar = new System.Windows.Forms.Button();
             this.login = new System.Windows.Forms.Button();
             this.signup = new System.Windows.Forms.Button();
+            this.consultasBasicas = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // Conectar
@@ -77,7 +78,7 @@
             // 
             // login
             // 
-            this.login.Location = new System.Drawing.Point(228, 271);
+            this.login.Location = new System.Drawing.Point(152, 271);
             this.login.Name = "login";
             this.login.Size = new System.Drawing.Size(137, 48);
             this.login.TabIndex = 4;
@@ -87,7 +88,7 @@
             // 
             // signup
             // 
-            this.signup.Location = new System.Drawing.Point(493, 271);
+            this.signup.Location = new System.Drawing.Point(394, 271);
             this.signup.Name = "signup";
             this.signup.Size = new System.Drawing.Size(137, 48);
             this.signup.TabIndex = 5;
@@ -95,11 +96,22 @@
             this.signup.UseVisualStyleBackColor = true;
             this.signup.Click += new System.EventHandler(this.signup_Click);
             // 
+            // consultasBasicas
+            // 
+            this.consultasBasicas.Location = new System.Drawing.Point(610, 271);
+            this.consultasBasicas.Name = "consultasBasicas";
+            this.consultasBasicas.Size = new System.Drawing.Size(174, 48);
+            this.consultasBasicas.TabIndex = 6;
+            this.consultasBasicas.Text = "Consultas Básicas";
+            this.consultasBasicas.UseVisualStyleBackColor = true;
+            this.consultasBasicas.Click += new System.EventHandler(this.consultasBasicas_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(901, 511);
+            this.Controls.Add(this.consultasBasicas);
             this.Controls.Add(this.signup);
             this.Controls.Add(this.login);
             this.Controls.Add(this.desconectar);
@@ -122,6 +134,7 @@
         private System.Windows.Forms.Button desconectar;
         private System.Windows.Forms.Button login;
         private System.Windows.Forms.Button signup;
+        private System.Windows.Forms.Button consultasBasicas;
     }
 }
 

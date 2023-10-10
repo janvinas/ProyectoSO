@@ -48,7 +48,7 @@
             this.Registrarse.Location = new System.Drawing.Point(176, 422);
             this.Registrarse.Name = "Registrarse";
             this.Registrarse.Size = new System.Drawing.Size(106, 40);
-            this.Registrarse.TabIndex = 0;
+            this.Registrarse.TabIndex = 7;
             this.Registrarse.Text = "Registrarse";
             this.Registrarse.UseVisualStyleBackColor = true;
             this.Registrarse.Click += new System.EventHandler(this.Registrarse_Click);
@@ -58,7 +58,7 @@
             this.cerrar.Location = new System.Drawing.Point(363, 456);
             this.cerrar.Name = "cerrar";
             this.cerrar.Size = new System.Drawing.Size(81, 33);
-            this.cerrar.TabIndex = 1;
+            this.cerrar.TabIndex = 8;
             this.cerrar.Text = "Cerrar";
             this.cerrar.UseVisualStyleBackColor = true;
             this.cerrar.Click += new System.EventHandler(this.cerrar_Click);
@@ -66,32 +66,36 @@
             // UsuarioTextbox
             // 
             this.UsuarioTextbox.Location = new System.Drawing.Point(144, 85);
+            this.UsuarioTextbox.MaxLength = 40;
             this.UsuarioTextbox.Name = "UsuarioTextbox";
             this.UsuarioTextbox.Size = new System.Drawing.Size(166, 26);
-            this.UsuarioTextbox.TabIndex = 2;
+            this.UsuarioTextbox.TabIndex = 1;
             // 
             // ContraseñaTextbox
             // 
             this.ContraseñaTextbox.Location = new System.Drawing.Point(144, 156);
+            this.ContraseñaTextbox.MaxLength = 40;
             this.ContraseñaTextbox.Name = "ContraseñaTextbox";
             this.ContraseñaTextbox.PasswordChar = '*';
             this.ContraseñaTextbox.Size = new System.Drawing.Size(166, 26);
-            this.ContraseñaTextbox.TabIndex = 3;
+            this.ContraseñaTextbox.TabIndex = 2;
             // 
             // RepetirContraseñaTextbox
             // 
             this.RepetirContraseñaTextbox.Location = new System.Drawing.Point(144, 229);
+            this.RepetirContraseñaTextbox.MaxLength = 40;
             this.RepetirContraseñaTextbox.Name = "RepetirContraseñaTextbox";
             this.RepetirContraseñaTextbox.PasswordChar = '*';
             this.RepetirContraseñaTextbox.Size = new System.Drawing.Size(166, 26);
-            this.RepetirContraseñaTextbox.TabIndex = 4;
+            this.RepetirContraseñaTextbox.TabIndex = 3;
             // 
             // MailTextbox
             // 
             this.MailTextbox.Location = new System.Drawing.Point(144, 297);
+            this.MailTextbox.MaxLength = 80;
             this.MailTextbox.Name = "MailTextbox";
             this.MailTextbox.Size = new System.Drawing.Size(166, 26);
-            this.MailTextbox.TabIndex = 5;
+            this.MailTextbox.TabIndex = 4;
             // 
             // Hombre
             // 
@@ -99,7 +103,7 @@
             this.Hombre.Location = new System.Drawing.Point(144, 371);
             this.Hombre.Name = "Hombre";
             this.Hombre.Size = new System.Drawing.Size(91, 24);
-            this.Hombre.TabIndex = 6;
+            this.Hombre.TabIndex = 5;
             this.Hombre.TabStop = true;
             this.Hombre.Text = "Hombre";
             this.Hombre.UseVisualStyleBackColor = true;
@@ -110,7 +114,7 @@
             this.Mujer.Location = new System.Drawing.Point(241, 371);
             this.Mujer.Name = "Mujer";
             this.Mujer.Size = new System.Drawing.Size(73, 24);
-            this.Mujer.TabIndex = 7;
+            this.Mujer.TabIndex = 6;
             this.Mujer.TabStop = true;
             this.Mujer.Text = "Mujer";
             this.Mujer.UseVisualStyleBackColor = true;

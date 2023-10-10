@@ -4,7 +4,17 @@ Definición de las consultas:
 	Desconectarse del servidor
 1/"Nombre"/"Contraseña"
 	Iniciar sesión
-	Retorna 1 si la contraseña es correcta
+	Retorna 1 si la contraseña es correcta, 0 si el usuario o contraseña son incorrectos.
+	Retorna -1 si ha ocurrido un error de SQL.
 2/"Nombre"/"Contraseña"/"Correo"/"Género"
 	Registrar un nuevo usuario
-	Retorna 1 si se ha creado el usuario satisfactoriamente
+	Retorna 1 si se ha creado el usuario satisfactoriamente, 0 si ya existía.
+	Retorna -1 si ha habido un error SQL.
+3/"Nombre"
+	Comprueba si existe el usuario
+	Retorna 1 si existe, 0 si no.
+
+
+4/"Construcción"
+	Devuelve una lista de construcciones del tipo especificado en todas las partidas
+	Formato de respuesta ID1/X1/Y1/ID2/X2/Y2 ...

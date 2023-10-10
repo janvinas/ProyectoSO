@@ -54,11 +54,15 @@ namespace Login
                     MessageBox.Show("Inicio de Sesion Exitoso");
                     Close();
                 }
-                else
+                else if(Convert.ToInt32(mensaje) == 0)
                 {
-                    MessageBox.Show("Error al iniciar sesion");
+                    MessageBox.Show("Usuario o contraseña incorrectos");
                     UsuarioTextbox.Text = "";
                     ContraseñaTextbox.Text = "";
+                }
+                else
+                {
+                    MessageBox.Show("Error de base de datos");
                 }
             }
         }
