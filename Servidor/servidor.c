@@ -148,6 +148,25 @@ int main(int argc, char *charv[]){
 				}
 				
 			}
+			else if(codigo==5){
+				char nombre[80];
+				token=strtok(NULL,"/");
+				strcpy(nombre,token);
+				char query1[500];
+				sprintf(query1, "SELECT Jug_Part.Dinero FROM (Jugador, Partidas,Jug_Part) WHERE Jugador.Usuario = '%s' AND Jugador.ID = Jug_Part.Jugador AND Partidas.ID = Jug_Part.Partida;", nombre);
+				int result = mysql_query(conn, query1);
+				if(result != 0){
+					sprintf(buff2, "-1");
+				}
+				else{
+					resultado = mysql_store_result (conn);
+					row = mysql_fetch_row (resultado);
+					if (row == NULL)
+						sprintf(buff2,"0");
+					else
+						sprintf(buff2,"%s",row[0]);
+				}
+			}
 
 
 			//imprimeix el buffer al socket i tanca'l

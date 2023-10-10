@@ -34,6 +34,9 @@
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.X = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Y = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ejecutar2 = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.consulta2 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -93,11 +96,40 @@
             this.Y.Name = "Y";
             this.Y.Width = 150;
             // 
+            // ejecutar2
+            // 
+            this.ejecutar2.Location = new System.Drawing.Point(361, 383);
+            this.ejecutar2.Name = "ejecutar2";
+            this.ejecutar2.Size = new System.Drawing.Size(162, 36);
+            this.ejecutar2.TabIndex = 4;
+            this.ejecutar2.Text = "Ejecutar consulta 2";
+            this.ejecutar2.UseVisualStyleBackColor = true;
+            this.ejecutar2.Click += new System.EventHandler(this.ejecutar2_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(13, 331);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(525, 20);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Consulta 1: Obtiene el dinero que teien la persona que se introduja abajo:";
+            // 
+            // consulta2
+            // 
+            this.consulta2.Location = new System.Drawing.Point(158, 388);
+            this.consulta2.Name = "consulta2";
+            this.consulta2.Size = new System.Drawing.Size(155, 26);
+            this.consulta2.TabIndex = 5;
+            // 
             // ConsultasBasicas
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1142, 761);
+            this.Controls.Add(this.consulta2);
+            this.Controls.Add(this.ejecutar2);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.ejecutar1);
             this.Controls.Add(this.label1);
@@ -117,5 +149,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn X;
         private System.Windows.Forms.DataGridViewTextBoxColumn Y;
+        private System.Windows.Forms.Button ejecutar2;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox consulta2;
     }
 }

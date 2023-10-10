@@ -36,7 +36,7 @@ namespace Login
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
             //al que deseamos conectarnos
             IPAddress direc = IPAddress.Parse(IP.Text);
-            IPEndPoint ipep = new IPEndPoint(direc, 9060);
+            IPEndPoint ipep = new IPEndPoint(direc, 9050);
 
 
             //Creamos el socket 

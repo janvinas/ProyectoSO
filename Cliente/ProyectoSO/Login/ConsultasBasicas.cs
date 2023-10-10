@@ -56,5 +56,23 @@ namespace Login
             }
 
         }
+
+        private void ejecutar2_Click(object sender, EventArgs e)
+        {
+            string mensaje = "5/" + consulta2.Text;
+            byte[] msg = Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+            byte[] msg2 = new byte[80];
+            server.Receive(msg2);
+            mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+
+            if(mensaje == "-1") 
+            {
+                MessageBox.Show("El usuario que has puesto no existe");
+            }else if(mensaje == "0")
+            {
+                MessageBox.Show("El dinero que tiene " + consulta2.Text + " es de: " + mensaje);
+            }
+        }
     }
 }
