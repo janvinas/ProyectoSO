@@ -28,6 +28,19 @@ namespace Login
             byte[] msg2 = new byte[80];
             server.Receive(msg2);
             mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+            string[] elementos = mensaje.Split('/');
+            int i = 0;
+            while(i < elementos.Length)
+            {
+                string[] cells = new string[3];
+                for (int j = 0; j < 3; j++)
+                {
+                    cells[j] = elementos[i];
+                    i++;
+
+                }
+                dataGridView1.Rows.Add(cells);
+            }
 
         }
     }

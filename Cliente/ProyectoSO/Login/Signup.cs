@@ -76,13 +76,17 @@ namespace Login
                     MessageBox.Show("Registro Exitoso");
                     Close();
                 }
-                else
+                else if(Convert.ToInt32(mensaje) == 0)
                 {
-                    MessageBox.Show("Error al iniciar sesion");
+                    MessageBox.Show("El usuario ya existe");
                     UsuarioTextbox.Text = "";
                     ContraseñaTextbox.Text = "";
                     RepetirContraseñaTextbox.Text = "";
                     MailTextbox.Text = "";
+                }
+                else
+                {
+                    MessageBox.Show("Error de base de datos");
                 }
             }
         }
