@@ -120,8 +120,34 @@ int main(int argc, char *charv[]){
 					}
 				}
 				
+			}else if(codigo == 4){
+				char construccion[50];
+				strcpy(construccion, strtok(NULL, "/"));
+				char query[500];
+				sprintf(query, "SELECT Partidas.ID, Part_Const.X, Part_Const.Y FROM (Construcciones, Partidas, Part_Const) "
+					 "WHERE Construcciones.nombre = '%s' "
+					 "AND Construcciones.ID = Part_Const.ID_Const "
+					 "AND Partidas.ID = Part_Const.ID_Part;", construccion);
+				int err = mysql_query(conn, query);
+				if(err != 0){
+					sprintf(buff2, "-1");
+				}else{
+					resultado = mysql_store_result (conn);
+					row = mysql_fetch_row(resultado);
+					if(row == NULL){
+						sprintf(buff2, "0");
+					}else{
+						sprintf(buff2, "%s/%s/%s", row[0], row[1], row[2]);
+						row = mysql_fetch_row (resultado);
+						while(row != NULL){
+							sprintf(buff2, "%s/%s/%s/%s", buff2, row[0], row[1], row[2]);
+							row = mysql_fetch_row (resultado);
+						}
+						printf("%s\n", buff2);
+					}
+				}
+				
 			}
-			//TODO añadir mensaje de registro
 
 
 			//imprimeix el buffer al socket i tanca'l

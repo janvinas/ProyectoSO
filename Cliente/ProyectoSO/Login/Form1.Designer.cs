@@ -98,6 +98,7 @@
             // 
             // consultasBasicas
             // 
+            this.consultasBasicas.Enabled = false;
             this.consultasBasicas.Location = new System.Drawing.Point(610, 271);
             this.consultasBasicas.Name = "consultasBasicas";
             this.consultasBasicas.Size = new System.Drawing.Size(174, 48);

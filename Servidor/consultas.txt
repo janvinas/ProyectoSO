@@ -18,3 +18,4 @@ Definición de las consultas:
 4/"Construcción"
 	Devuelve una lista de construcciones del tipo especificado en todas las partidas
 	Formato de respuesta ID1/X1/Y1/ID2/X2/Y2 ...
+	Retorna 0 si la lista está vacía y -1 si ha ocurrido un error de base de datos.

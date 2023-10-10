@@ -22,12 +22,25 @@ namespace Login
 
         private void ejecutar1_Click(object sender, EventArgs e)
         {
-            string mensaje = "4/'Terminal'";
+            string mensaje = "4/Terminal";
             byte[] msg = Encoding.ASCII.GetBytes(mensaje);
             server.Send(msg);
             byte[] msg2 = new byte[80];
             server.Receive(msg2);
             mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+
+            if(mensaje == "-1")
+            {
+                MessageBox.Show("Error de base de datos");
+                return;
+            }
+            else if(mensaje == "0")
+            {
+                MessageBox.Show("No se ha encontrado ningún resultado");
+                return;
+            }
+
+            dataGridView1.Rows.Clear();
             string[] elementos = mensaje.Split('/');
             int i = 0;
             while(i < elementos.Length)
