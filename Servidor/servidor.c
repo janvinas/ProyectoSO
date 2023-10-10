@@ -67,21 +67,59 @@ int main(int argc, char *charv[]){
 				close(sock_conn);
 				printf("Cliente desconectado\n");
 				break;
-			}else if(codigo == 1){
+			}
+			else if (codigo ==1){
 				char nombre[40];
 				strcpy(nombre, strtok(NULL, "/"));
 				char password[40];
 				strcpy(password, strtok(NULL, "/"));
-				char email[80];
+				char query[500];
+				sprintf(query, "SELECT Usuario FROM Jugador WHERE Usuario='%s' AND Password='%s'", nombre, password);
+				int result = mysql_query(conn, query);
+				if(result != 0){
+					sprintf(buff2, "-1");
+				}
+				else{
+					resultado = mysql_store_result (conn);
+					row = mysql_fetch_row (resultado);
+					if (row == NULL)
+						sprintf(buff2,"0");
+					else
+						sprintf(buff2,"1");
+				}
+			}
+			else if(codigo == 2){
+				char nombre[50];
+				strcpy(nombre, strtok(NULL, "/"));
+				char password[50];
+				strcpy(password, strtok(NULL, "/"));
+				char email[90];
 				strcpy(email, strtok(NULL, "/"));
 				char genero = strtok(NULL, "/")[0];	//el género tiene un único carácter
 
-				char query[300];
-				sprintf(query, "INSERT INTO Jugador (Usuario, Password, Mail, Genero) VALUES (\'%s\', \'%s\', \'%s\', \'%c\');", nombre, password, email, genero);
-				int result = mysql_query(conn, query);
+				char query1[500];
+				sprintf(query1, "SELECT Usuario FROM Jugador WHERE Usuario='%s'", nombre);
+				int result = mysql_query(conn, query1);
 				if(result != 0){
-					sprintf(buff2, "-100");
+					sprintf(buff2, "-1");
 				}
+				else{
+					resultado = mysql_store_result (conn);
+					row = mysql_fetch_row (resultado);
+					if (row == NULL){
+						char query2[500];
+						sprintf(query2, "INSERT INTO Jugador (Usuario, Password, Mail, Genero) VALUES (\'%s\', \'%s\', \'%s\', \'%c\');", nombre, password, email, genero);
+						int result = mysql_query(conn, query2);
+						if(result != 0){
+							sprintf(buff2, "-1");
+						}else{
+							sprintf(buff2, "1");
+						}
+					}else{
+						sprintf(buff2,"0"); //Usuario o contraseña existentes
+					}
+				}
+				
 			}
 			//TODO añadir mensaje de registro
 
