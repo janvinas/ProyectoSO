@@ -162,7 +162,7 @@ int main(int argc, char *charv[]){
 					resultado = mysql_store_result (conn);
 					row = mysql_fetch_row (resultado);
 					if (row == NULL)
-						sprintf(buff2,"0");
+						sprintf(buff2,"-2");
 					else
 						sprintf(buff2,"%s",row[0]);
 				}

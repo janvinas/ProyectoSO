@@ -66,10 +66,14 @@ namespace Login
             server.Receive(msg2);
             mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
 
-            if(mensaje == "-1") 
+            if(mensaje == "-2") 
             {
                 MessageBox.Show("El usuario que has puesto no existe");
-            }else if(mensaje == "0")
+            }else if(mensaje == "-1")
+            {
+                MessageBox.Show("Error de base de datos");
+            }
+            else
             {
                 MessageBox.Show("El dinero que tiene " + consulta2.Text + " es de: " + mensaje);
             }
