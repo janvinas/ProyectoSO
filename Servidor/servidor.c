@@ -96,7 +96,8 @@ int main(int argc, char *charv[]){
 				char email[90];
 				strcpy(email, strtok(NULL, "/"));
 				char genero = strtok(NULL, "/")[0];	//el género tiene un único carácter
-
+				
+				
 				char query1[500];
 				sprintf(query1, "SELECT Usuario FROM Jugador WHERE Usuario='%s'", nombre);
 				int result = mysql_query(conn, query1);
@@ -108,8 +109,9 @@ int main(int argc, char *charv[]){
 					row = mysql_fetch_row (resultado);
 					if (row == NULL){
 						char query2[500];
-						sprintf(query2, "INSERT INTO Jugador (Usuario, Password, Mail, Genero) VALUES (\'%s\', \'%s\', \'%s\', \'%c\');", nombre, password, email, genero);
-						int result = mysql_query(conn, query2);
+						sprintf(query2, "INSERT INTO Jugador (Usuario, Password, Mail, Genero) VALUES ('%s', '%s', '%s', '%c');", nombre, password, email, genero);
+						result = mysql_query(conn, query2);
+						printf("%s\n",query2);
 						if(result != 0){
 							sprintf(buff2, "-1");
 						}else{
