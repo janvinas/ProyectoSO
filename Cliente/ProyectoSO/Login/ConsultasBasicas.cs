@@ -78,5 +78,41 @@ namespace Login
                 MessageBox.Show("El dinero que tiene " + consulta2.Text + " es de: " + mensaje);
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string mensaje = "6/";
+            byte[] msg = Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+            byte[] msg2 = new byte[80];
+            server.Receive(msg2);
+            mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+
+            if (mensaje == "-1")
+            {
+                MessageBox.Show("Error de base de datos");
+                return;
+            }
+            else if (mensaje == "0")
+            {
+                MessageBox.Show("No se ha encontrado ningún resultado");
+                return;
+            }
+
+            dataGridView2.Rows.Clear();
+            string[] elementos = mensaje.Split('/');
+            int i = 0;
+            while (i < elementos.Length)
+            {
+                string[] cells = new string[3];
+                for (int j = 0; j < 2; j++)
+                {
+                    cells[j] = elementos[i];
+                    i++;
+
+                }
+                dataGridView2.Rows.Add(cells);
+            }
+        }
     }
 }
