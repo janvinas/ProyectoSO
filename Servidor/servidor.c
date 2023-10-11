@@ -166,6 +166,27 @@ int main(int argc, char *charv[]){
 					else
 						sprintf(buff2,"%s",row[0]);
 				}
+			else if(codigo==6){
+				char query[500];
+				sprintf(query, "SELECT Jugador.Usuario, Logros.descripcion FROM (Jugador, Logros, Jug_Log) WHERE Jug_Log.logro_obtenido = 'yes' AND Jug_Log.recompensa_obtenida = 'no' AND Jugador.ID = Jug_Log.ID_Jugadores AND Logros.ID = Jug_Log.ID_Logro;");
+				int err = mysql_query(conn, query);
+				if(err != 0){
+					sprintf(buff2, "-1");
+				}else{
+					resultado = mysql_store_result (conn);
+					row = mysql_fetch_row(resultado);
+					if(row == NULL){
+						sprintf(buff2, "0");
+					}else{
+						sprintf(buff2, "%s/%s", row[0], row[1]);
+						row = mysql_fetch_row (resultado);
+						while(row != NULL){
+							sprintf(buff2, "%s/%s/%s", buff2, row[0], row[1]);
+							row = mysql_fetch_row (resultado);
+						}
+						printf("%s\n", buff2);
+					}
+				}
 			}
 
 
