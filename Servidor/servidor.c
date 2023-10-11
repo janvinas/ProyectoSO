@@ -163,9 +163,16 @@ int main(int argc, char *charv[]){
 					row = mysql_fetch_row (resultado);
 					if (row == NULL)
 						sprintf(buff2,"-2");
-					else
-						sprintf(buff2,"%s",row[0]);
+					else{
+						int dtotal=0;
+						while(row!=NULL){
+							dtotal += atoi(row[0]);
+							row = mysql_fetch_row (resultado);
+						}
+						sprintf(buff2,"%d",dtotal);
+					}
 				}
+			}
 			else if(codigo==6){
 				char query[500];
 				sprintf(query, "SELECT Jugador.Usuario, Logros.descripcion FROM (Jugador, Logros, Jug_Log) WHERE Jug_Log.logro_obtenido = 'yes' AND Jug_Log.recompensa_obtenida = 'no' AND Jugador.ID = Jug_Log.ID_Jugadores AND Logros.ID = Jug_Log.ID_Logro;");

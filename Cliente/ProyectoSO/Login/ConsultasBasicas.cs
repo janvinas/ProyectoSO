@@ -59,23 +59,31 @@ namespace Login
 
         private void ejecutar2_Click(object sender, EventArgs e)
         {
-            string mensaje = "5/" + consulta2.Text;
-            byte[] msg = Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
-            byte[] msg2 = new byte[80];
-            server.Receive(msg2);
-            mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+            if (consulta2.Text != "")
+            {
+                string mensaje = "5/" + consulta2.Text;
+                byte[] msg = Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+                byte[] msg2 = new byte[80];
+                server.Receive(msg2);
+                mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
 
-            if(mensaje == "-2") 
-            {
-                MessageBox.Show("El usuario que has puesto no existe");
-            }else if(mensaje == "-1")
-            {
-                MessageBox.Show("Error de base de datos");
+                if (mensaje == "-2")
+                {
+                    MessageBox.Show("El usuario que has puesto no existe");
+                }
+                else if (mensaje == "-1")
+                {
+                    MessageBox.Show("Error de base de datos");
+                }
+                else
+                {
+                    MessageBox.Show("El dinero que tiene " + consulta2.Text + " es de: " + mensaje);
+                }
             }
             else
             {
-                MessageBox.Show("El dinero que tiene " + consulta2.Text + " es de: " + mensaje);
+                MessageBox.Show("Debes escribir el Usuario");
             }
         }
 

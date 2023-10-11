@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS AirportSIM;
 CREATE DATABASE AirportSIM;
 USE AirportSIM;
 CREATE TABLE Jugador(
-	ID INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	ID INTEGER PRIMARY KEY NOT NULL,
 	Usuario TEXT NOT NULL,
 	Password TEXT NOT NULL,
 	Mail TEXT NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE Partidas(
 );
 
 CREATE TABLE Jug_Part(
-	Jugador INTEGER PRIMARY KEY NOT NULL,
+	Jugador INTEGER NOT NULL,
 	Partida INTEGER NOT NULL,
 	Dinero INTEGER NOT NULL,
 	FOREIGN KEY (Jugador) REFERENCES Jugador(ID),
@@ -62,10 +62,16 @@ INSERT INTO Jugador VALUE(3,'JanVinas','janvinas','jan.vinas@gmail.com','M');
 INSERT INTO Partidas (ID, Hinicio, TimePlayed) VALUES (1, '2023-09-03 17:09:00', 0);
 INSERT INTO Partidas (ID, Hinicio, TimePlayed) VALUES (2, '2023-09-15 22:15:00', 0);
 INSERT INTO Partidas (ID, Hinicio, TimePlayed) VALUES (3, '2023-09-27 02:15:00', 0);
+INSERT INTO Partidas (ID, Hinicio, TimePlayed) VALUES (4, '2023-09-03 17:09:00', 0);
+INSERT INTO Partidas (ID, Hinicio, TimePlayed) VALUES (5, '2023-09-15 22:15:00', 0);
+INSERT INTO Partidas (ID, Hinicio, TimePlayed) VALUES (6, '2023-09-27 02:15:00', 0);
 
-INSERT INTO Jug_Part VALUES (1,1,0);
+INSERT INTO Jug_Part VALUES (1,1,20);
+INSERT INTO Jug_Part VALUES (1,4,10);
+INSERT INTO Jug_Part VALUES (1,6,5);
 INSERT INTO Jug_Part VALUES (2,2,0);
-INSERT INTO Jug_Part VALUES (3,3,0);
+INSERT INTO Jug_Part VALUES (3,3,40);
+INSERT INTO Jug_Part VALUES (3,5,50);
 
 INSERT INTO Construcciones VALUES (1, 'Pista de Aterrizaje', 100000000);
 INSERT INTO Construcciones VALUES (2, 'Terminal', 70000000);
@@ -85,7 +91,4 @@ INSERT INTO Jug_Log VALUES (1, 1, 'yes', 'yes');
 INSERT INTO Jug_Log VALUES (2, 1, 'yes', 'no');
 INSERT INTO Jug_Log VALUES (2, 1, 'no', 'no');
 INSERT INTO Jug_Log VALUES (3, 2, 'yes', 'no');
-
-	
-	
 	
