@@ -24,4 +24,6 @@ Definición de las consultas:
 	La respuesta es un número decimal, -2 si no existe el jugador, o -1 si ha ocurrido un error de base de datos.
 
 6/
-	Devuelve los nombres de los jugadores y la descripción de los logros que cada jugador ha obtenido, pero no ha reclamado su recompensa
+	Devuelve los nombres de los jugadores y la descripción de los logros que cada jugador ha obtenido, pero no ha reclamado su 	recompensa
+	Formato de respuesta Usuario1/Descripcion_logro1/Usuario2_Descripcion_logro2 ...
+	Retorna 0 si la lista está vacía y -1 si ha ocurrido un error de base de datos.
