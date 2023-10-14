@@ -95,5 +95,35 @@ namespace Login
         {
             Close();
         }
+
+        private void UsuarioTextbox_TextChanged(object sender, EventArgs e)
+        {
+            if (UsuarioTextbox.Text.Length == 0)
+            {
+                return;
+            }
+
+            string mensaje = "3/" + UsuarioTextbox.Text;
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            UsuarioTextbox.ForeColor = Color.DarkGray;
+            server.Send(msg);
+
+            byte[] msg2 = new byte[80];
+            server.Receive(msg2);
+            mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+
+            if (mensaje == "1")
+            {
+                UsuarioTextbox.ForeColor = Color.Red;
+            }
+            else if (mensaje == "0")
+            {
+                UsuarioTextbox.ForeColor = Color.Green;
+            }
+            else
+            {
+                UsuarioTextbox.ForeColor = Color.Black;
+            }
+        }
     }
 }

@@ -49,6 +49,7 @@ namespace Login
                 login.Enabled = true;
                 signup.Enabled = true;
                 consultasBasicas.Enabled = true;
+                Conectar.Enabled = false;
 
             }
             catch (SocketException ex)
@@ -74,6 +75,7 @@ namespace Login
                 login.Enabled = false;
                 signup.Enabled = false;
                 consultasBasicas.Enabled = false;
+                Conectar.Enabled = true;
             }
             else
                 MessageBox.Show("No estas conectado con el servidor");
@@ -101,6 +103,24 @@ namespace Login
         {
             ConsultasBasicas consultasBasicas= new ConsultasBasicas(server);
             consultasBasicas.ShowDialog();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (server != null) //se tiene q intenar hacer un try pero peta
+            {
+                string mensaje = "0/";
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+                // Se terminó el servicio. 
+                // Nos desconectamos
+                this.BackColor = Color.Gray;
+                server.Shutdown(SocketShutdown.Both);
+                server.Close();
+                login.Enabled = false;
+                signup.Enabled = false;
+                consultasBasicas.Enabled = false;
+            }
         }
     }
 }

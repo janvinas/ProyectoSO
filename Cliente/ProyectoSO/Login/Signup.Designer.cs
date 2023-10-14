@@ -70,6 +70,7 @@
             this.UsuarioTextbox.Name = "UsuarioTextbox";
             this.UsuarioTextbox.Size = new System.Drawing.Size(166, 26);
             this.UsuarioTextbox.TabIndex = 1;
+            this.UsuarioTextbox.TextChanged += new System.EventHandler(this.UsuarioTextbox_TextChanged);
             // 
             // ContraseñaTextbox
             // 
