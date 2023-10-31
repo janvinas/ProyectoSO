@@ -10,3 +10,5 @@ Versión 1 comunicada por Pau Serrano
 URL: https://youtu.be/uNoLDaOYpak
 
 Version 2 generada por Carlos Muñoz
+
+Versión 2 verificada por Pau Serrano
