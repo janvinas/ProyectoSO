@@ -38,6 +38,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.listaConectados = new System.Windows.Forms.DataGridView();
             this.actualizarListaConectados = new System.Windows.Forms.Button();
+            this.Nombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.listaConectados)).BeginInit();
             this.SuspendLayout();
             // 
@@ -123,9 +124,14 @@
             // 
             // listaConectados
             // 
+            this.listaConectados.AllowUserToAddRows = false;
+            this.listaConectados.AllowUserToDeleteRows = false;
             this.listaConectados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.listaConectados.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Nombre});
             this.listaConectados.Location = new System.Drawing.Point(25, 171);
             this.listaConectados.Name = "listaConectados";
+            this.listaConectados.ReadOnly = true;
             this.listaConectados.RowHeadersWidth = 62;
             this.listaConectados.RowTemplate.Height = 28;
             this.listaConectados.Size = new System.Drawing.Size(180, 277);
@@ -140,6 +146,14 @@
             this.actualizarListaConectados.Text = "Actualizar";
             this.actualizarListaConectados.UseVisualStyleBackColor = true;
             this.actualizarListaConectados.Click += new System.EventHandler(this.actualizarListaConectados_Click);
+            // 
+            // Nombre
+            // 
+            this.Nombre.HeaderText = "Nombre";
+            this.Nombre.MinimumWidth = 8;
+            this.Nombre.Name = "Nombre";
+            this.Nombre.ReadOnly = true;
+            this.Nombre.Width = 150;
             // 
             // Form1
             // 
@@ -178,6 +192,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.DataGridView listaConectados;
         private System.Windows.Forms.Button actualizarListaConectados;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Nombre;
     }
 }
 

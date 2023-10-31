@@ -24,14 +24,14 @@ MYSQL_RES *resultado;
 MYSQL_ROW row;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-ListaConectados miLista;
+ListaConectados listaConectados;
 
 int addConectado (ListaConectados *lista, char nombre[50], int socket) {
 	if (lista -> num == 100){
 		return -1;
 	}
 	else {
-		strcpy(lista -> conectados[lista -> num], nombre);
+		strcpy(lista -> conectados[lista -> num].nombre, nombre);
 		lista -> conectados[lista->num].socket = socket;
 		lista -> num++;
 		return 0;
@@ -46,9 +46,10 @@ int DameNombre (ListaConectados *lista, int socket, char nombre[50]) {
 		if (encontrado == 0)
 			i++;
 	}
-	if (encontrado  == 1)
+	if (encontrado  == 1){
 		strcpy(nombre, lista -> conectados[i].nombre);
 		return 0;
+	}
 	else
 		return -1;
 }
@@ -75,7 +76,7 @@ int eliminarConectado (ListaConectados *lista, char nombre[50])
 		return -1;
 	else {
 		int i;
-		for (i = pos, i < lista -> num-1; i++)
+		for (i = pos; i < lista -> num-1; i++)
 		{
 			strcpy(lista -> conectados[i].nombre, lista -> conectados[i+1].nombre);
 			lista -> conectados[i].socket = lista -> conectados[i+1].socket;
@@ -96,9 +97,9 @@ void DameConectados(ListaConectados * lista, char conectados[300]) {
 }
 
 void login(char *response, int socket, ListaConectados *lista){
-	char nombre[40];
+	char nombre[50];
 	strcpy(nombre, strtok(NULL, "/"));
-	char password[40];
+	char password[50];
 	strcpy(password, strtok(NULL, "/"));
 	char query[500];
 	sprintf(query, "SELECT Usuario FROM Jugador WHERE Usuario='%s' AND Password='%s'", nombre, password);
@@ -274,12 +275,12 @@ void *atenderCliente(void *socket){
 		if(codigo == 0){
 			close(sock_conn);
 			char nombre[50];
-			DameNombre(lista, sock_conn, nombre);
-			eliminarConectado(lista, nombre);
+			DameNombre(&listaConectados, sock_conn, nombre);
+			eliminarConectado(&listaConectados, nombre);
 			printf("Cliente desconectado\n");
 			break;
 		}else if (codigo ==1){
-			login(buff2, sock_conn, lista);
+			login(buff2, sock_conn, &listaConectados);
 		}else if(codigo == 2){
 			signup(buff2);
 		}else if(codigo == 3){
@@ -291,7 +292,7 @@ void *atenderCliente(void *socket){
 		}else if(codigo==6){
 			consultaBasicaLogros(buff2);
 		}else if(codigo==7) {
-			DameConectados(lista, buff2);
+			DameConectados(&listaConectados, buff2);
 		}
 		
 
@@ -303,7 +304,7 @@ void *atenderCliente(void *socket){
 }
 
 int main(int argc, char *charv[]){
-	miLista.num=0;
+	listaConectados.num=0;
 	
 	conn = mysql_init(NULL);
 	if(conn==NULL){

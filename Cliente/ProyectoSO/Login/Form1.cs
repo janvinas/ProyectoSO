@@ -148,6 +148,7 @@ namespace Login
             while(i < tokens.Length)
             {
                 listaConectados.Rows.Add(tokens[i]);
+                i++;
             }
         }
     }
