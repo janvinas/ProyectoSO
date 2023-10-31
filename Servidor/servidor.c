@@ -8,13 +8,94 @@
 #include <stdio.h>
 #include <pthread.h>
 
+typedef struct{
+	char nombre [50];
+	int socket;
+} Conectado;
+typedef struct{
+	Conectado conectados[100];
+	int num;
+} ListaConectados;
+
+
+
 MYSQL *conn;
 MYSQL_RES *resultado;
 MYSQL_ROW row;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+ListaConectados miLista;
 
-void login(char *response){
+int addConectado (ListaConectados *lista, char nombre[50], int socket) {
+	if (lista -> num == 100){
+		return -1;
+	}
+	else {
+		strcpy(lista -> conectados[lista -> num], nombre);
+		lista -> conectados[lista->num].socket = socket;
+		lista -> num++;
+		return 0;
+	}
+}
+int DameNombre (ListaConectados *lista, int socket, char nombre[50]) {
+	int i=0;
+	int encontrado = 0;
+	while ((i < (lista -> num)) && encontrado == 0){
+		if (lista -> conectados[i].socket == socket)
+			encontrado = 1;
+		if (encontrado == 0)
+			i++;
+	}
+	if (encontrado  == 1)
+		strcpy(nombre, lista -> conectados[i].nombre);
+		return 0;
+	else
+		return -1;
+}
+
+int DamePosicion (ListaConectados *lista, char nombre[50]) {
+	int i=0;
+	int encontrado = 0;
+	while ((i < (lista -> num)) && encontrado == 0){
+		if (strcmp(lista -> conectados[i].nombre, nombre) == 0)
+			encontrado = 1;
+		if (encontrado == 0)
+			i++;
+	}
+	if (encontrado  == 1)
+		return i;
+	else
+		return -1;
+}
+	
+int eliminarConectado (ListaConectados *lista, char nombre[50])
+{
+	int pos = DamePosicion (lista, nombre);
+	if (pos == -1)
+		return -1;
+	else {
+		int i;
+		for (i = pos, i < lista -> num-1; i++)
+		{
+			strcpy(lista -> conectados[i].nombre, lista -> conectados[i+1].nombre);
+			lista -> conectados[i].socket = lista -> conectados[i+1].socket;
+		}
+		lista->num = lista->num-1;
+		return 0;
+	
+	}
+}
+
+void DameConectados(ListaConectados * lista, char conectados[300]) {
+	//Pone en conectados los nombres de todos los conectados separados por /
+	// "3/Juan/Maria/Pedro"
+	sprintf(conectados, "%d", lista -> num);
+	int i;
+	for (i=0; i < lista -> num; i++)
+		sprintf (conectados, "%s/%s", conectados, lista->conectados[i].nombre);
+}
+
+void login(char *response, int socket, ListaConectados *lista){
 	char nombre[40];
 	strcpy(nombre, strtok(NULL, "/"));
 	char password[40];
@@ -31,7 +112,10 @@ void login(char *response){
 		if (row == NULL)
 			sprintf(response,"0");
 		else
+		{
 			sprintf(response,"1");
+			addConectado(lista, nombre, socket);
+		}	
 	}
 }
 
@@ -189,10 +273,13 @@ void *atenderCliente(void *socket){
 
 		if(codigo == 0){
 			close(sock_conn);
+			char nombre[50];
+			DameNombre(lista, sock_conn, nombre);
+			eliminarConectado(lista, nombre);
 			printf("Cliente desconectado\n");
 			break;
 		}else if (codigo ==1){
-			login(buff2);
+			login(buff2, sock_conn, lista);
 		}else if(codigo == 2){
 			signup(buff2);
 		}else if(codigo == 3){
@@ -203,7 +290,10 @@ void *atenderCliente(void *socket){
 			consultaBasicaDinero(buff2);
 		}else if(codigo==6){
 			consultaBasicaLogros(buff2);
+		}else if(codigo==7) {
+			DameConectados(lista, buff2);
 		}
+		
 
 		//imprimeix el buffer al socket i tanca'l
 		//la resposta només s'envia si el codi del missatge no és 0
@@ -213,6 +303,8 @@ void *atenderCliente(void *socket){
 }
 
 int main(int argc, char *charv[]){
+	miLista.num=0;
+	
 	conn = mysql_init(NULL);
 	if(conn==NULL){
 		printf("Error creant connexió SQL: %u %s\n", mysql_errno(conn), mysql_error(conn));
