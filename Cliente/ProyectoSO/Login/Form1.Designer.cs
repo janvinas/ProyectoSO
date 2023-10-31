@@ -36,6 +36,9 @@
             this.signup = new System.Windows.Forms.Button();
             this.consultasBasicas = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.listaConectados = new System.Windows.Forms.DataGridView();
+            this.actualizarListaConectados = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.listaConectados)).BeginInit();
             this.SuspendLayout();
             // 
             // Conectar
@@ -79,7 +82,7 @@
             // 
             // login
             // 
-            this.login.Location = new System.Drawing.Point(152, 271);
+            this.login.Location = new System.Drawing.Point(277, 271);
             this.login.Name = "login";
             this.login.Size = new System.Drawing.Size(136, 48);
             this.login.TabIndex = 4;
@@ -89,7 +92,7 @@
             // 
             // signup
             // 
-            this.signup.Location = new System.Drawing.Point(394, 271);
+            this.signup.Location = new System.Drawing.Point(443, 271);
             this.signup.Name = "signup";
             this.signup.Size = new System.Drawing.Size(136, 48);
             this.signup.TabIndex = 5;
@@ -118,11 +121,33 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // listaConectados
+            // 
+            this.listaConectados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.listaConectados.Location = new System.Drawing.Point(25, 171);
+            this.listaConectados.Name = "listaConectados";
+            this.listaConectados.RowHeadersWidth = 62;
+            this.listaConectados.RowTemplate.Height = 28;
+            this.listaConectados.Size = new System.Drawing.Size(180, 277);
+            this.listaConectados.TabIndex = 8;
+            // 
+            // actualizarListaConectados
+            // 
+            this.actualizarListaConectados.Location = new System.Drawing.Point(109, 454);
+            this.actualizarListaConectados.Name = "actualizarListaConectados";
+            this.actualizarListaConectados.Size = new System.Drawing.Size(96, 33);
+            this.actualizarListaConectados.TabIndex = 9;
+            this.actualizarListaConectados.Text = "Actualizar";
+            this.actualizarListaConectados.UseVisualStyleBackColor = true;
+            this.actualizarListaConectados.Click += new System.EventHandler(this.actualizarListaConectados_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(902, 511);
+            this.Controls.Add(this.actualizarListaConectados);
+            this.Controls.Add(this.listaConectados);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.consultasBasicas);
             this.Controls.Add(this.signup);
@@ -135,6 +160,7 @@
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.listaConectados)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -150,6 +176,8 @@
         private System.Windows.Forms.Button signup;
         private System.Windows.Forms.Button consultasBasicas;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.DataGridView listaConectados;
+        private System.Windows.Forms.Button actualizarListaConectados;
     }
 }
 
