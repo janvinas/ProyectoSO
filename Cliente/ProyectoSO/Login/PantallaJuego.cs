@@ -19,6 +19,8 @@ namespace Login
             InitializeComponent();
         }
 
+        
+
         private void MainGameTimerEvent(object sender, EventArgs e)
         {
             if(goRight == true && player.Left < this.ClientSize.Width-player.Size.Width)
@@ -44,7 +46,8 @@ namespace Login
                 {
                     if ((string)x.Tag == "Tree")
                     {
-
+                        if (player.Top == x.Top - player.Size.Height)
+                            goUp = false;
                     }
                 }
             }
