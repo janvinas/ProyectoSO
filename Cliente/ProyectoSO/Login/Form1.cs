@@ -122,5 +122,11 @@ namespace Login
                 consultasBasicas.Enabled = false;
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            PantallaJuego pantallaJuego = new PantallaJuego();
+            pantallaJuego.ShowDialog();
+        }
     }
 }
