@@ -125,7 +125,7 @@ namespace Login
 
         private void button1_Click(object sender, EventArgs e)
         {
-            PantallaJuego pantallaJuego = new PantallaJuego();
+            PantallaJuegos pantallaJuego = new PantallaJuegos();
             pantallaJuego.ShowDialog();
         }
 

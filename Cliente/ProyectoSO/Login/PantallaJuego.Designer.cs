@@ -1,6 +1,6 @@
 ﻿namespace Login
 {
-    partial class PantallaJuego
+    partial class PantallaJuegos
     {
         /// <summary>
         /// Required designer variable.
@@ -148,8 +148,8 @@
             // player
             // 
             this.player.BackColor = System.Drawing.Color.Transparent;
-            this.player.Image = global::Login.Properties.Resources.car;
-            this.player.InitialImage = global::Login.Properties.Resources.car;
+            this.player.Image = global::Login.Properties.Resources.car_up;
+            this.player.InitialImage = global::Login.Properties.Resources.car_up;
             this.player.Location = new System.Drawing.Point(300, 500);
             this.player.Name = "player";
             this.player.Size = new System.Drawing.Size(30, 50);
@@ -157,7 +157,7 @@
             this.player.TabIndex = 0;
             this.player.TabStop = false;
             // 
-            // PantallaJuego
+            // PantallaJuegos
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -173,9 +173,9 @@
             this.Controls.Add(this.player);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
-            this.Name = "PantallaJuego";
+            this.Name = "PantallaJuegos";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "PantallaJuego";
+            this.Text = "Juego";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PantallaJuego_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PantallaJuego_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();

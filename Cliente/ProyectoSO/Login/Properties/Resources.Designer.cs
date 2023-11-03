@@ -63,9 +63,39 @@ namespace Login.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap car {
+        internal static System.Drawing.Bitmap car_down {
             get {
-                object obj = ResourceManager.GetObject("car", resourceCulture);
+                object obj = ResourceManager.GetObject("car_down", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap car_leftpng {
+            get {
+                object obj = ResourceManager.GetObject("car_leftpng", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap car_right {
+            get {
+                object obj = ResourceManager.GetObject("car_right", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap car_up {
+            get {
+                object obj = ResourceManager.GetObject("car_up", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

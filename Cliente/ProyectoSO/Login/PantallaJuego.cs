@@ -10,34 +10,49 @@ using System.Windows.Forms;
 
 namespace Login
 {
-    public partial class PantallaJuego : Form
+
+    public partial class PantallaJuegos : Form
     {
         bool goLeft, goRight, goUp, goDown;
         int playerSpeed=5;
-        public PantallaJuego()
+        public PantallaJuegos()
         {
             InitializeComponent();
         }
-
-        
 
         private void MainGameTimerEvent(object sender, EventArgs e)
         {
             if(goRight == true && player.Left < this.ClientSize.Width-player.Size.Width)
             {
                 player.Left += playerSpeed;
+                player.Image = Properties.Resources.car_right;
+                Size size = new Size(50, 30);
+                player.Size = size;
+
             }
-            if (goLeft == true && player.Left > 0)
+            else if (goLeft == true && player.Left > 0)
             {
                 player.Left -= playerSpeed;
+                player.Image = Properties.Resources.car_leftpng;
+                Size size = new Size(50, 30);
+                player.Size = size;
+
             }
-            if (goUp == true && player.Top > 0)
+            else if (goUp == true && player.Top > 0)
             {
                 player.Top -= playerSpeed;
+                player.Image = Properties.Resources.car_up;
+                Size size = new Size(30, 50);
+                player.Size = size;
+
             }
-            if (goDown == true && player.Top < this.ClientSize.Height - player.Size.Height)
+            else if (goDown == true && player.Top < this.ClientSize.Height - player.Size.Height)
             {
                 player.Top += playerSpeed;
+                player.Image = Properties.Resources.car_down;
+                Size size = new Size(30, 50);
+                player.Size = size;
+                
             }
 
             foreach(Control x in this.Controls)
