@@ -9,6 +9,14 @@ Versión 1 comunicada por Pau Serrano
 
 URL: https://youtu.be/uNoLDaOYpak
 
-Version 2 generada por Carlos Muñoz
+---
+
+Versión 2 generada por Carlos Muñoz
 
 Versión 2 verificada por Pau Serrano
+
+Versión 2 verificada por Jan Viñas
+
+https://youtu.be/v2ButI5GFJw
+
+https://youtu.be/gRtI0Vdg4gA
