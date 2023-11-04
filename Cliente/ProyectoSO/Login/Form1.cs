@@ -62,7 +62,12 @@ namespace Login
                     case 5:
                         
                         break;
+                    case 6:
 
+                        break;
+                    case 7:
+                        actualizarListaConnenctados(mensaje);
+                        break;
                 }
             }
         }
@@ -167,24 +172,13 @@ namespace Login
             PantallaJuegos pantallaJuego = new PantallaJuegos();
             pantallaJuego.ShowDialog();
         }
-
-        private void actualizarListaConectados_Click(object sender, EventArgs e)
+        private void actualizarListaConnenctados(string mensaje)
         {
-            if (server == null) return;
-
-            string mensaje = "7/";
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
-
-            byte[] msg2 = new byte[300];
-            server.Receive(msg2);
-            mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-
             string[] tokens = mensaje.Split('/');
 
             listaConectados.Rows.Clear();
             int i = 1;
-            while(i < tokens.Length)
+            while (i < tokens.Length)
             {
                 listaConectados.Rows.Add(tokens[i]);
                 i++;
