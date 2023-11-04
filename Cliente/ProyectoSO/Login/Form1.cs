@@ -42,7 +42,7 @@ namespace Login
             {
                 byte[] msg2 = new byte[300];
                 server.Receive(msg2);
-                string[] trozos = Encoding.ASCII.GetString(msg2).Split('/');
+                string[] trozos = Encoding.ASCII.GetString(msg2).Split(new[] { '/' }, 2);
                 int codigo = Convert.ToInt32(trozos[0]);
                 string mensaje = trozos[1].Split('\0')[0];
                 switch (codigo)
@@ -114,6 +114,7 @@ namespace Login
                 // Se terminó el servicio. 
                 // Nos desconectamos
                 this.BackColor = Color.Gray;
+                atender.Abort();
                 server.Shutdown(SocketShutdown.Both);
                 server.Close();
                 login.Enabled = false;
@@ -131,6 +132,7 @@ namespace Login
             loginForm.ShowDialog();
             Usuario = loginForm.GetUsuario();
             Password = loginForm.GetPassword();
+            login.Enabled = false;
         }
 
         private void signup_Click(object sender, EventArgs e)
@@ -151,20 +153,24 @@ namespace Login
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (server != null) //se tiene q intenar hacer un try pero peta
+            if (server == null || !server.Connected)
             {
-                string mensaje = "0/";
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
-                // Se terminó el servicio. 
-                // Nos desconectamos
-                this.BackColor = Color.Gray;
-                server.Shutdown(SocketShutdown.Both);
-                server.Close();
-                login.Enabled = false;
-                signup.Enabled = false;
-                consultasBasicas.Enabled = false;
+                return;
             }
+
+            string mensaje = "0/";
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+            // Se terminó el servicio. 
+            // Nos desconectamos
+            this.BackColor = Color.Gray;
+            atender.Abort();
+            server.Shutdown(SocketShutdown.Both);
+            server.Close();
+            login.Enabled = false;
+            signup.Enabled = false;
+            consultasBasicas.Enabled = false;
+
         }
 
         private void button1_Click(object sender, EventArgs e)

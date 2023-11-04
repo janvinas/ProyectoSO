@@ -108,11 +108,12 @@ void DameConectados(ListaConectados * lista, char conectados[300]) {
  * Código de respuesta: 7
 */
 void enviarConectados(){
+	char stringConectados[300];
+	DameConectados(&listaConectados, stringConectados);
 	for(int i = 0; i < listaConectados.num; i++){
-		char stringConectados[300];
-		DameConectados(&listaConectados, stringConectados);
 		write(listaConectados.conectados[i].socket, stringConectados, strlen(stringConectados));
 	}
+	printf("Notificación enviada!: %s\n", stringConectados);
 }
 
 /*******************************
