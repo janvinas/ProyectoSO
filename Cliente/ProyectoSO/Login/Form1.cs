@@ -47,19 +47,19 @@ namespace Login
                 string mensaje = trozos[1].Split('\0')[0];
                 switch (codigo)
                 {
-                    case 1://respuesta a longitud
+                    case 1:
                         loginForm.onResponse(mensaje);
                         break;
-                    case 2://si mi nombre es bonito
+                    case 2:
                         signupForm.onResponse(mensaje);
                         break;
-                    case 3://si eres alto
+                    case 3:
                         signupForm.onResponseColor(mensaje);
                         break;
-                    case 4://si eres palandrino
+                    case 4:
                         
                         break;
-                    case 5://mayusculas
+                    case 5:
                         
                         break;
 
