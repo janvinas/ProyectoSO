@@ -17,7 +17,8 @@ typedef struct{
 	int num;
 } ListaConectados;
 
-
+int sockets[100];
+int numSockets = 0;
 
 MYSQL *conn;
 MYSQL_RES *resultado;
@@ -25,6 +26,11 @@ MYSQL_ROW row;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 ListaConectados listaConectados;
+
+
+/*********************************************
+Funciones que gestionan la lista de conectados
+**********************************************/
 
 int addConectado (ListaConectados *lista, char nombre[50], int socket) {
 	if (lista -> num == 100){
@@ -87,14 +93,31 @@ int eliminarConectado (ListaConectados *lista, char nombre[50])
 	}
 }
 
+
 void DameConectados(ListaConectados * lista, char conectados[300]) {
 	//Pone en conectados los nombres de todos los conectados separados por /
-	// "3/Juan/Maria/Pedro"
-	sprintf(conectados, "%d", lista -> num);
+	// "7/n/Juan/Maria/Pedro"
+	sprintf(conectados, "7/%d", lista -> num);
 	int i;
 	for (i=0; i < lista -> num; i++)
 		sprintf (conectados, "%s/%s", conectados, lista->conectados[i].nombre);
 }
+
+/**
+ * Envía una notifiación a todos los usuarios con la nueva lista de conectados.
+ * Código de respuesta: 7
+*/
+void enviarConectados(){
+	for(int i = 0; i < listaConectados.num; i++){
+		char stringConectados[300];
+		DameConectados(&listaConectados, stringConectados);
+		write(listaConectados.conectados[i].socket, stringConectados, strlen(stringConectados));
+	}
+}
+
+/*******************************
+Funciones de gestión de usuarios
+*******************************/
 
 void login(char *response, int socket, ListaConectados *lista){
 	char nombre[50];
@@ -105,20 +128,22 @@ void login(char *response, int socket, ListaConectados *lista){
 	sprintf(query, "SELECT Usuario FROM Jugador WHERE Usuario='%s' AND Password='%s'", nombre, password);
 	int result = mysql_query(conn, query);
 	if(result != 0){
-		sprintf(response, "-1");
+		sprintf(response, "1/-1");
 	}
 	else{
 		resultado = mysql_store_result (conn);
 		row = mysql_fetch_row (resultado);
 		if (row == NULL)
-			sprintf(response,"0");
+			sprintf(response,"1/0");
 		else
 		{
-			sprintf(response,"1");
+			sprintf(response,"1/1");
 			addConectado(lista, nombre, socket);
+			enviarConectados();	//envía una notificación a todos los usuarios con la nueva lista de conectados
 		}	
 	}
 }
+
 
 void signup(char *response){
 	char nombre[50];
@@ -134,7 +159,7 @@ void signup(char *response){
 	sprintf(query1, "SELECT Usuario FROM Jugador WHERE Usuario='%s'", nombre);
 	int result = mysql_query(conn, query1);
 	if(result != 0){
-		sprintf(response, "-1");
+		sprintf(response, "2/-1");
 	}
 	else{
 		resultado = mysql_store_result (conn);
@@ -147,12 +172,12 @@ void signup(char *response){
 			pthread_mutex_unlock(&mutex);
 			printf("%s\n",query2);
 			if(result != 0){
-				sprintf(response, "-1");
+				sprintf(response, "2/-1");
 			}else{
-				sprintf(response, "1");
+				sprintf(response, "2/1");
 			}
 		}else{
-			sprintf(response,"0"); //Usuario o contraseña existentes
+			sprintf(response,"2/0"); //Usuario o contraseña existentes
 		}
 	}
 }
@@ -164,18 +189,22 @@ void existeUsuario(char *response){
 	sprintf(query, "SELECT Usuario FROM Jugador WHERE Usuario='%s'", nombre);
 	int result = mysql_query(conn, query);
 	if(result != 0){
-		sprintf(response, "-1");
+		sprintf(response, "3/-1");
 	}
 	else{
 		resultado = mysql_store_result (conn);
 		row = mysql_fetch_row (resultado);
 		if (row == NULL)
-			sprintf(response,"0");
+			sprintf(response,"3/0");
 		else
-			sprintf(response,"1");
+			sprintf(response,"3/1");
 	}
 }
 
+
+/*******************************************
+Funciones de respuestas de consultas básicas
+*******************************************/
 void consultaBasicaConstrucciones(char *response){
 	char construccion[50];
 	strcpy(construccion, strtok(NULL, "/"));
@@ -186,14 +215,14 @@ void consultaBasicaConstrucciones(char *response){
 			"AND Partidas.ID = Part_Const.ID_Part;", construccion);
 	int err = mysql_query(conn, query);
 	if(err != 0){
-		sprintf(response, "-1");
+		sprintf(response, "4/-1");
 	}else{
 		resultado = mysql_store_result (conn);
 		row = mysql_fetch_row(resultado);
 		if(row == NULL){
-			sprintf(response, "0");
+			sprintf(response, "4/0");
 		}else{
-			sprintf(response, "%s/%s/%s", row[0], row[1], row[2]);
+			sprintf(response, "4/%s/%s/%s", row[0], row[1], row[2]);
 			row = mysql_fetch_row (resultado);
 			while(row != NULL){
 				sprintf(response, "%s/%s/%s/%s", response, row[0], row[1], row[2]);
@@ -212,20 +241,20 @@ void consultaBasicaDinero(char *response){
 	sprintf(query1, "SELECT Jug_Part.Dinero FROM (Jugador, Partidas,Jug_Part) WHERE Jugador.Usuario = '%s' AND Jugador.ID = Jug_Part.Jugador AND Partidas.ID = Jug_Part.Partida;", nombre);
 	int result = mysql_query(conn, query1);
 	if(result != 0){
-		sprintf(response, "-1");
+		sprintf(response, "5/-1");
 	}
 	else{
 		resultado = mysql_store_result (conn);
 		row = mysql_fetch_row (resultado);
 		if (row == NULL)
-			sprintf(response,"-2");
+			sprintf(response,"5/-2");
 		else{
 			int dtotal=0;
 			while(row!=NULL){
 				dtotal += atoi(row[0]);
 				row = mysql_fetch_row (resultado);
 			}
-			sprintf(response,"%d",dtotal);
+			sprintf(response,"5/%d",dtotal);
 		}
 	}
 }
@@ -235,14 +264,14 @@ void consultaBasicaLogros(char *response){
 	sprintf(query, "SELECT Jugador.Usuario, Logros.descripcion FROM (Jugador, Logros, Jug_Log) WHERE Jug_Log.logro_obtenido = 'yes' AND Jug_Log.recompensa_obtenida = 'no' AND Jugador.ID = Jug_Log.ID_Jugadores AND Logros.ID = Jug_Log.ID_Logro;");
 	int err = mysql_query(conn, query);
 	if(err != 0){
-		sprintf(response, "-1");
+		sprintf(response, "6/-1");
 	}else{
 		resultado = mysql_store_result (conn);
 		row = mysql_fetch_row(resultado);
 		if(row == NULL){
-			sprintf(response, "0");
+			sprintf(response, "6/0");
 		}else{
-			sprintf(response, "%s/%s", row[0], row[1]);
+			sprintf(response, "6/%s/%s", row[0], row[1]);
 			row = mysql_fetch_row (resultado);
 			while(row != NULL){
 				sprintf(response, "%s/%s/%s", response, row[0], row[1]);
@@ -253,9 +282,10 @@ void consultaBasicaLogros(char *response){
 	}
 }
 
-
-// función que se ejecutará cada vez que un cliente se conecte y se cree un socket.
-// la función termina cuando el cliente se desconecta.
+/**
+* función que se ejecutará cada vez que un cliente se conecte y se cree un socket.
+* la función termina cuando el cliente se desconecta.
+*/
 void *atenderCliente(void *socket){
 	int sock_conn = *((int*) socket);
 
@@ -277,6 +307,7 @@ void *atenderCliente(void *socket){
 			char nombre[50];
 			DameNombre(&listaConectados, sock_conn, nombre);
 			eliminarConectado(&listaConectados, nombre);
+			enviarConectados();	//envía una notificación a todos los usuarios con la nueva lista de conectados
 			printf("Cliente desconectado\n");
 			break;
 		}else if (codigo ==1){
@@ -291,8 +322,6 @@ void *atenderCliente(void *socket){
 			consultaBasicaDinero(buff2);
 		}else if(codigo==6){
 			consultaBasicaLogros(buff2);
-		}else if(codigo==7) {
-			DameConectados(&listaConectados, buff2);
 		}
 		
 
@@ -340,15 +369,13 @@ int main(int argc, char *charv[]){
 		exit(-1);
 	}
 
-	int sockets[100];
-	int i = 0;
 	while(1){
 		printf("Escuchando\n");
 		int sock_conn = accept(sock_listen, NULL, NULL);
 		printf("Cliente conectado\n");
-		sockets[i] = sock_conn;
+		sockets[numSockets] = sock_conn;
 		pthread_t t;	//no necessitem aquest valor, no el guardem enlloc
-		pthread_create(&t, NULL, atenderCliente, &sockets[i]);
-		i++;
+		pthread_create(&t, NULL, atenderCliente, &sockets[numSockets]);
+		numSockets++;
 	}
 }

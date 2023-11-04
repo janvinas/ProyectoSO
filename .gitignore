@@ -401,3 +401,5 @@ FodyWeavers.xsd
 # c compile results
 *.out
 *.exe
+
+.vscode
