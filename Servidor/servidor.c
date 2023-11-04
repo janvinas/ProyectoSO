@@ -168,9 +168,7 @@ void signup(char *response){
 		if (row == NULL){
 			char query2[500];
 			sprintf(query2, "INSERT INTO Jugador (Usuario, Password, Mail, Genero) VALUES ('%s', '%s', '%s', '%c');", nombre, password, email, genero);
-			pthread_mutex_lock(&mutex);
 			result = mysql_query(conn, query2);
-			pthread_mutex_unlock(&mutex);
 			printf("%s\n",query2);
 			if(result != 0){
 				sprintf(response, "2/-1");
