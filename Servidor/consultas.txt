@@ -1,29 +1,37 @@
-Definición de las consultas:
+Definición de las consultas
+===========================
 
 0/
 	Desconectarse del servidor
 1/"Nombre"/"Contraseña"
 	Iniciar sesión
-	Retorna 1 si la contraseña es correcta, 0 si el usuario o contraseña son incorrectos.
-	Retorna -1 si ha ocurrido un error de SQL.
+	Retorna 1/1 si la contraseña es correcta, 1/0 si el usuario o contraseña son incorrectos.
+	Retorna 1/-1 si ha ocurrido un error de SQL.
 2/"Nombre"/"Contraseña"/"Correo"/"Género"
 	Registrar un nuevo usuario
-	Retorna 1 si se ha creado el usuario satisfactoriamente, 0 si ya existía.
-	Retorna -1 si ha habido un error SQL.
+	Retorna 2/1 si se ha creado el usuario satisfactoriamente, 0 si ya existía.
+	Retorna 2/-1 si ha habido un error SQL.
 3/"Nombre"
 	Comprueba si existe el usuario
-	Retorna 1 si existe, 0 si no.
+	Retorna 3/1 si existe, 3/0 si no.
 
 
 4/"Construcción"
 	Devuelve una lista de construcciones del tipo especificado en todas las partidas
 	Formato de respuesta ID1/X1/Y1/ID2/X2/Y2 ...
-	Retorna 0 si la lista está vacía y -1 si ha ocurrido un error de base de datos.
+	Retorna 4/0 si la lista está vacía y 4/-1 si ha ocurrido un error de base de datos.
 5/"Nombre"
 	Devuelve el dinero que tiene la persona especificada
-	La respuesta es un número decimal, -2 si no existe el jugador, o -1 si ha ocurrido un error de base de datos.
+	La respuesta es un número decimal, 5/-2 si no existe el jugador, o -5/1 si ha ocurrido un error de base de datos.
 
 6/
 	Devuelve los nombres de los jugadores y la descripción de los logros que cada jugador ha obtenido, pero no ha reclamado su 	recompensa
 	Formato de respuesta Usuario1/Descripcion_logro1/Usuario2_Descripcion_logro2 ...
-	Retorna 0 si la lista está vacía y -1 si ha ocurrido un error de base de datos.
+	Retorna 6/0 si la lista está vacía y 6/-1 si ha ocurrido un error de base de datos.
+
+
+Notificaciones
+==============
+
+7/
+	Envía la lista de usuarios conectados en formato 7/n/Juan/Maria...	(n es el número de usuarios conectados)
