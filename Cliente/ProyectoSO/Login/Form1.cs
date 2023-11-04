@@ -24,6 +24,7 @@ namespace Login
         string Genero;
         Login loginForm;
         Signup signupForm;
+        ConsultasBasicas consultasBasicasForm;
         public Form1()
         {
             InitializeComponent();
@@ -57,13 +58,13 @@ namespace Login
                         signupForm.onResponseColor(mensaje);
                         break;
                     case 4:
-                        
+                        consultasBasicasForm.Consulta1(mensaje);
                         break;
                     case 5:
-                        
+                        consultasBasicasForm.Consulta2(mensaje);
                         break;
                     case 6:
-
+                        consultasBasicasForm.Consulta3(mensaje);
                         break;
                     case 7:
                         actualizarListaConnenctados(mensaje);
@@ -147,8 +148,8 @@ namespace Login
 
         private void consultasBasicas_Click(object sender, EventArgs e)
         {
-            ConsultasBasicas consultasBasicas= new ConsultasBasicas(server);
-            consultasBasicas.ShowDialog();
+            consultasBasicasForm = new ConsultasBasicas(server);
+            consultasBasicasForm.ShowDialog();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
