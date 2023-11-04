@@ -65,29 +65,44 @@ namespace Login
                     "/" + Genero;
                 // Enviamos al servidor el nombre tecleado
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
+                server.Send(msg);                
+            }
+        }
 
-                //Recibimos la respuesta del servidor
-                byte[] msg2 = new byte[80];
-                server.Receive(msg2);
-                mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                if (Convert.ToInt32(mensaje) == 1)
-                {
-                    MessageBox.Show("Registro Exitoso");
-                    Close();
-                }
-                else if(Convert.ToInt32(mensaje) == 0)
-                {
-                    MessageBox.Show("El usuario ya existe");
-                    UsuarioTextbox.Text = "";
-                    ContraseñaTextbox.Text = "";
-                    RepetirContraseñaTextbox.Text = "";
-                    MailTextbox.Text = "";
-                }
-                else
-                {
-                    MessageBox.Show("Error de base de datos");
-                }
+        public void onResponse(string mensaje)
+        {
+            if (Convert.ToInt32(mensaje) == 1)
+            {
+                MessageBox.Show("Registro Exitoso");
+                Close();
+            }
+            else if (Convert.ToInt32(mensaje) == 0)
+            {
+                MessageBox.Show("El usuario ya existe");
+                UsuarioTextbox.Text = "";
+                ContraseñaTextbox.Text = "";
+                RepetirContraseñaTextbox.Text = "";
+                MailTextbox.Text = "";
+            }
+            else
+            {
+                MessageBox.Show("Error de base de datos");
+            }
+        }
+
+        public void onResponseColor(string mensaje)
+        {
+            if (mensaje == "1")
+            {
+                UsuarioTextbox.ForeColor = Color.Red;
+            }
+            else if (mensaje == "0")
+            {
+                UsuarioTextbox.ForeColor = Color.Green;
+            }
+            else
+            {
+                UsuarioTextbox.ForeColor = Color.Black;
             }
         }
 
@@ -106,24 +121,7 @@ namespace Login
             string mensaje = "3/" + UsuarioTextbox.Text;
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
             UsuarioTextbox.ForeColor = Color.DarkGray;
-            server.Send(msg);
-
-            byte[] msg2 = new byte[80];
-            server.Receive(msg2);
-            mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-
-            if (mensaje == "1")
-            {
-                UsuarioTextbox.ForeColor = Color.Red;
-            }
-            else if (mensaje == "0")
-            {
-                UsuarioTextbox.ForeColor = Color.Green;
-            }
-            else
-            {
-                UsuarioTextbox.ForeColor = Color.Black;
-            }
+            server.Send(msg);            
         }
     }
 }
