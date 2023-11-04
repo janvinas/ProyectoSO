@@ -44,29 +44,26 @@ namespace Login
                 // Enviamos al servidor el nombre tecleado
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
-
-                //Recibimos la respuesta del servidor
-                byte[] msg2 = new byte[80];
-                server.Receive(msg2);
-                mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                if (Convert.ToInt32(mensaje) == 1)
-                {
-                    MessageBox.Show("Inicio de Sesion Exitoso");
-                    Close();
-                }
-                else if(Convert.ToInt32(mensaje) == 0)
-                {
-                    MessageBox.Show("Usuario o contraseña incorrectos");
-                    UsuarioTextbox.Text = "";
-                    ContraseñaTextbox.Text = "";
-                }
-                else
-                {
-                    MessageBox.Show("Error de base de datos");
-                }
             }
         }
-
+        public void onResponse(string mensaje)
+        {
+            if (Convert.ToInt32(mensaje) == 1)
+            {
+                MessageBox.Show("Inicio de Sesion Exitoso");
+                Close();
+            }
+            else if (Convert.ToInt32(mensaje) == 0)
+            {
+                MessageBox.Show("Usuario o contraseña incorrectos");
+                UsuarioTextbox.Text = "";
+                ContraseñaTextbox.Text = "";
+            }
+            else
+            {
+                MessageBox.Show("Error de base de datos");
+            }
+        }
         private void cerrar_Click(object sender, EventArgs e)
         {
             Close();

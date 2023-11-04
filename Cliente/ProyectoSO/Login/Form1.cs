@@ -9,26 +9,62 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
+using System.Runtime.Remoting.Messaging;
 
 namespace Login
 {
     public partial class Form1 : Form
     {
         Socket server;
+        Thread atender;
         string Usuario;
         string Password;
         string Mail;
         string Genero;
-        
+        Login loginForm;
+        Signup signupForm;
         public Form1()
         {
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             login.Enabled = false;
             signup.Enabled = false;
+        }
+
+        private void AtenderServidor()
+        {
+            while (true)
+            {
+                byte[] msg2 = new byte[300];
+                server.Receive(msg2);
+                string[] trozos = Encoding.ASCII.GetString(msg2).Split('/');
+                int codigo = Convert.ToInt32(trozos[0]);
+                string mensaje = trozos[1].Split('\0')[0];
+                switch (codigo)
+                {
+                    case 1://respuesta a longitud
+                        loginForm.onResponse(mensaje);
+                        break;
+                    case 2://si mi nombre es bonito
+                        signupForm.onResponse(mensaje);
+                        break;
+                    case 3://si eres alto
+                        signupForm.onResponseColor(mensaje);
+                        break;
+                    case 4://si eres palandrino
+                        
+                        break;
+                    case 5://mayusculas
+                        
+                        break;
+
+                }
+            }
         }
 
         private void Conectar_Click(object sender, EventArgs e)
@@ -58,6 +94,9 @@ namespace Login
                 MessageBox.Show("No he podido conectar con el servidor");
                 return;
             }
+            ThreadStart ts = delegate { AtenderServidor(); };
+            atender = new Thread(ts);
+            atender.Start();
         }
 
         private void desconectar_Click(object sender, EventArgs e)
@@ -83,20 +122,20 @@ namespace Login
 
         private void login_Click(object sender, EventArgs e)
         {
-            Login login = new Login(server);
-            login.ShowDialog();
-            Usuario = login.GetUsuario();
-            Password = login.GetPassword();
+            loginForm = new Login(server);
+            loginForm.ShowDialog();
+            Usuario = loginForm.GetUsuario();
+            Password = loginForm.GetPassword();
         }
 
         private void signup_Click(object sender, EventArgs e)
         {
-            Signup signup = new Signup(server);
-            signup.ShowDialog();
-            Usuario=signup.GetUsuario();
-            Password=signup.GetPassword();
-            Mail = signup.GetMail();
-            Genero = signup.GetGenero();
+            signupForm = new Signup(server);
+            signupForm.ShowDialog();
+            Usuario= signupForm.GetUsuario();
+            Password= signupForm.GetPassword();
+            Mail = signupForm.GetMail();
+            Genero = signupForm.GetGenero();
         }
 
         private void consultasBasicas_Click(object sender, EventArgs e)
