@@ -339,7 +339,7 @@ int main(int argc, char *charv[]){
 		printf("Error creant connexió SQL: %u %s\n", mysql_errno(conn), mysql_error(conn));
 		exit(-1);
 	}
-	conn = mysql_real_connect(conn, "localhost", "root", "mysql", "AirportSIM", 0, NULL, 0);
+	conn = mysql_real_connect(conn, "localhost", "root", "mysql", "T4_BBDDJuego", 0, NULL, 0);
 	if(conn==NULL){
 		printf("Error creant connexió SQL: %u %s\n", mysql_errno(conn), mysql_error(conn));
 		exit(-1);
