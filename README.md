@@ -15,7 +15,7 @@ Versión 2 generada por Carlos Muñoz
 
 Versión 2 verificada por Pau Serrano
 
-Versión 2 verificada por Jan Viñas
+Versión 2 comunicada por Jan Viñas
 
 https://youtu.be/v2ButI5GFJw
 
@@ -24,3 +24,5 @@ https://youtu.be/gRtI0Vdg4gA
 ---
 
 Versión 3 generada por Pau Serrano
+
+Versión 3 verificada por Jan Viñas
