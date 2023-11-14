@@ -67,7 +67,13 @@ namespace Login
                         consultasBasicasForm.Consulta3(mensaje);
                         break;
                     case 7:
-                        actualizarListaConnenctados(mensaje);
+                        actualizarListaConectados(mensaje);
+                        break;
+                    case 8:
+                        MessageBox.Show("Invitación enviada");
+                        break;
+                    case 9:
+                        MessageBox.Show("Te han invitado a una partida");
                         break;
                 }
             }
@@ -179,7 +185,7 @@ namespace Login
             PantallaJuegos pantallaJuego = new PantallaJuegos();
             pantallaJuego.ShowDialog();
         }
-        private void actualizarListaConnenctados(string mensaje)
+        private void actualizarListaConectados(string mensaje)
         {
             string[] tokens = mensaje.Split('/');
 
@@ -190,6 +196,17 @@ namespace Login
                 listaConectados.Rows.Add(tokens[i]);
                 i++;
             }
+        }
+
+        private void botonInvitar_Click(object sender, EventArgs e)
+        {
+            string message = "8/" + listaConectados.SelectedCells.Count;
+            foreach(DataGridViewCell cell in listaConectados.SelectedCells)
+            {
+                message += "/" + cell.Value;
+            }
+            byte[] msg = Encoding.ASCII.GetBytes(message);
+            server.Send(msg);
         }
     }
 }

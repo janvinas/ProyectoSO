@@ -287,9 +287,32 @@ void invitacionjugadores(char *response, int socketOrigen) {
 	char nombreInvitador[80];
 	numInvitados = atoi(strtok(NULL, "/"));
 	int i = 0;
-	char invitacion;
+	char invitacion[300];
 	sprintf(response, "8/1"); // (/1 significa "Ya se ha invitado al resto de jugadores.")
 	while (i<numInvitados){
+		char *token = strtok(NULL,"/");
+		strcpy(nombre,token);
+		int n = DamePosicion(&listaConectados, nombre);
+		if (n != -1)
+		{
+			DameNombre(&listaConectados, socketOrigen, nombreInvitador);
+			sprintf(invitacion, "9/%s\n", nombreInvitador);
+			write(listaConectados.conectados[n].socket, invitacion, strlen(invitacion));
+			printf("Notificación enviada a %s\n", nombre);
+		}
+		i++;
+	}
+}
+
+void invitacionjugadores(char *response, int socketOrigen) {
+	int numInvitados;
+	char nombre[80];
+	char nombreInvitador[80];
+	numInvitados = atoi(strtok(NULL, "/"));
+	int i = 0;
+	char invitacion;
+	char buff[512]; //petición
+	char buff2[512]; //respuesta
 		char *token = strtok(NULL,"/");
 		strcpy(nombre,token);
 		int n = DamePosicion(&listaConectados, nombre);
@@ -322,10 +345,14 @@ void *atenderCliente(void *socket){
 
 		char *token = strtok(buff, "/");
 		int codigo = atoi(token);
+		else if(codigo==8) {
+			invitacionjugadores(buff2, sock_conn);
+		}
 
 		if(codigo == 0){
 			close(sock_conn);
 			char nombre[50];
+		
 			DameNombre(&listaConectados, sock_conn, nombre);
 			eliminarConectado(&listaConectados, nombre);
 			enviarConectados();	//envía una notificación a todos los usuarios con la nueva lista de conectados
@@ -339,7 +366,7 @@ void *atenderCliente(void *socket){
 			existeUsuario(buff2);
 		}else if(codigo == 4){
 			consultaBasicaConstrucciones(buff2);
-		}else if(codigo==5){
+	conn = mysql_real_connect(conn, "localhost", "root", "mysql", "T4_BBDDJuego", 0, NULL, 0);
 			consultaBasicaDinero(buff2);
 		}else if(codigo==6){
 			consultaBasicaLogros(buff2);
