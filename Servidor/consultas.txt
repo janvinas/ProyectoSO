@@ -28,10 +28,13 @@ Definición de las consultas
 	Devuelve los nombres de los jugadores y la descripción de los logros que cada jugador ha obtenido, pero no ha reclamado su 	recompensa
 	Formato de respuesta Usuario1/Descripcion_logro1/Usuario2_Descripcion_logro2 ...
 	Retorna 6/0 si la lista está vacía y 6/-1 si ha ocurrido un error de base de datos.
-
+8/
+	Envía mensaje de invitación a los jugadores que aparecen en el mensaje que recibe del jugador.
 
 Notificaciones
 ==============
 
 7/
 	Envía la lista de usuarios conectados en formato 7/n/Juan/Maria...	(n es el número de usuarios conectados)
+
+
