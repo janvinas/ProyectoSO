@@ -281,6 +281,28 @@ void consultaBasicaLogros(char *response){
 	}
 }
 
+void invitacionjugadores(char *response, int socketOrigen) {
+	int numInvitados;
+	char nombre[80];
+	char nombreInvitador[80];
+	numInvitados = atoi(strtok(NULL, "/"));
+	int i = 0;
+	char invitacion;
+	sprintf(response, "8/1"); // (/1 significa "Ya se ha invitado al resto de jugadores.")
+	while (i<numInvitados){
+		char *token = strtok(NULL,"/");
+		strcpy(nombre,token);
+		int n = DamePosicion(&listaConectados, nombre);
+		if (n != -1)
+		{
+			DameNombre(listaConectados, socketOrigen, nombreInvitador);
+			sprintf(invitacion, "%s%s\n", "9/",  nombreInvitador);
+			write(listaConectados.conectados[n].socket, invitacion, strlen(invitacion));
+			printf("Notificación enviada a %s\n", nombre);
+		}
+	}
+}
+
 /**
 * función que se ejecutará cada vez que un cliente se conecte y se cree un socket.
 * la función termina cuando el cliente se desconecta.
@@ -288,8 +310,8 @@ void consultaBasicaLogros(char *response){
 void *atenderCliente(void *socket){
 	int sock_conn = *((int*) socket);
 
-	char buff[512];
-	char buff2[512];
+	char buff[512]; //petición
+	char buff2[512]; //respuesta
 
 	while(1){
 		int ret=read(sock_conn,buff, sizeof(buff));
@@ -321,6 +343,9 @@ void *atenderCliente(void *socket){
 			consultaBasicaDinero(buff2);
 		}else if(codigo==6){
 			consultaBasicaLogros(buff2);
+		}
+		else if(codigo==8) {
+			invitacionjugadores(buff2, sock_conn);
 		}
 		
 
