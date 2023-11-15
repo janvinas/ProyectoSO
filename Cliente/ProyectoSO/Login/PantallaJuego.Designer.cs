@@ -38,6 +38,12 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.Tree1 = new System.Windows.Forms.PictureBox();
             this.player = new System.Windows.Forms.PictureBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.cerrar = new System.Windows.Forms.Button();
+            this.continua = new System.Windows.Forms.Button();
+            this.opciones = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.cerrar_opt = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
@@ -46,12 +52,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Tree1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.player)).BeginInit();
+            this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // GameTimer
             // 
             this.GameTimer.Enabled = true;
-            this.GameTimer.Interval = 10;
+            this.GameTimer.Interval = 50;
             this.GameTimer.Tick += new System.EventHandler(this.MainGameTimerEvent);
             // 
             // pictureBox6
@@ -157,12 +165,74 @@
             this.player.TabIndex = 0;
             this.player.TabStop = false;
             // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.panel1.Controls.Add(this.opciones);
+            this.panel1.Controls.Add(this.continua);
+            this.panel1.Controls.Add(this.cerrar);
+            this.panel1.Location = new System.Drawing.Point(710, 290);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(500, 500);
+            this.panel1.TabIndex = 8;
+            // 
+            // cerrar
+            // 
+            this.cerrar.Location = new System.Drawing.Point(203, 346);
+            this.cerrar.Name = "cerrar";
+            this.cerrar.Size = new System.Drawing.Size(92, 50);
+            this.cerrar.TabIndex = 0;
+            this.cerrar.Text = "Salir";
+            this.cerrar.UseVisualStyleBackColor = true;
+            this.cerrar.Click += new System.EventHandler(this.cerrar_Click);
+            // 
+            // continua
+            // 
+            this.continua.Location = new System.Drawing.Point(139, 91);
+            this.continua.Name = "continua";
+            this.continua.Size = new System.Drawing.Size(219, 61);
+            this.continua.TabIndex = 1;
+            this.continua.Text = "Continua";
+            this.continua.UseVisualStyleBackColor = true;
+            this.continua.Click += new System.EventHandler(this.continua_Click);
+            // 
+            // opciones
+            // 
+            this.opciones.Location = new System.Drawing.Point(139, 198);
+            this.opciones.Name = "opciones";
+            this.opciones.Size = new System.Drawing.Size(219, 62);
+            this.opciones.TabIndex = 2;
+            this.opciones.Text = "Opciones";
+            this.opciones.UseVisualStyleBackColor = true;
+            this.opciones.Click += new System.EventHandler(this.opciones_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.Gray;
+            this.panel2.Controls.Add(this.cerrar_opt);
+            this.panel2.Location = new System.Drawing.Point(263, 438);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(357, 205);
+            this.panel2.TabIndex = 3;
+            // 
+            // cerrar_opt
+            // 
+            this.cerrar_opt.Location = new System.Drawing.Point(129, 153);
+            this.cerrar_opt.Name = "cerrar_opt";
+            this.cerrar_opt.Size = new System.Drawing.Size(92, 45);
+            this.cerrar_opt.TabIndex = 0;
+            this.cerrar_opt.Text = "Cerrar";
+            this.cerrar_opt.UseVisualStyleBackColor = true;
+            this.cerrar_opt.Click += new System.EventHandler(this.cerrar_opt_Click);
+            // 
             // PantallaJuegos
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.ClientSize = new System.Drawing.Size(878, 844);
+            this.ClientSize = new System.Drawing.Size(1920, 1080);
+            this.Controls.Add(this.panel2);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.pictureBox6);
             this.Controls.Add(this.pictureBox5);
             this.Controls.Add(this.pictureBox4);
@@ -171,11 +241,13 @@
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.Tree1);
             this.Controls.Add(this.player);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
             this.Name = "PantallaJuegos";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Juego";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Load += new System.EventHandler(this.PantallaJuegos_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PantallaJuego_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PantallaJuego_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
@@ -186,6 +258,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Tree1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.player)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -201,5 +275,11 @@
         private System.Windows.Forms.PictureBox pictureBox4;
         private System.Windows.Forms.PictureBox pictureBox5;
         private System.Windows.Forms.PictureBox pictureBox6;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button cerrar;
+        private System.Windows.Forms.Button continua;
+        private System.Windows.Forms.Button opciones;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button cerrar_opt;
     }
 }
