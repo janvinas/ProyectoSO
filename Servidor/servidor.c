@@ -17,6 +17,21 @@ typedef struct{
 	int num;
 } ListaConectados;
 
+typedef struct{
+	char nombre[80];
+	char aceptado;
+}Jugador;
+typedef struct{
+	Jugador jugadores[20];
+	int numJugadores;
+}Partida;
+typedef struct{
+	Partida partidas[20];
+	int numPartidas;
+}ListaPartidas;
+
+ListaPartidas listaPartidas;
+
 int sockets[100];
 int numSockets = 0;
 
@@ -281,7 +296,7 @@ void consultaBasicaLogros(char *response){
 	}
 }
 
-void invitacionjugadores(char *response, int socketOrigen) {
+void invitacionJugadores(char *response, int socketOrigen) {
 	int numInvitados;
 	char nombre[80];
 	char nombreInvitador[80];
@@ -289,18 +304,53 @@ void invitacionjugadores(char *response, int socketOrigen) {
 	int i = 0;
 	char invitacion[300];
 	sprintf(response, "8/1"); // (/1 significa "Ya se ha invitado al resto de jugadores.")
+	DameNombre(&listaConectados, socketOrigen, nombreInvitador);
+	
+	int idPartida = listaPartidas.numPartidas;
+	strcpy(listaPartidas.partidas[idPartida].jugadores[0].nombre, nombreInvitador);
+	listaPartidas.partidas[idPartida].numJugadores = 1;
+	listaPartidas.numPartidas++;
+	
 	while (i<numInvitados){
 		char *token = strtok(NULL,"/");
 		strcpy(nombre,token);
 		int n = DamePosicion(&listaConectados, nombre);
 		if (n != -1)
 		{
-			DameNombre(&listaConectados, socketOrigen, nombreInvitador);
-			sprintf(invitacion, "9/%s\n", nombreInvitador);
+			int numJugador = listaPartidas.partidas[idPartida].numJugadores;
+			listaPartidas.partidas[idPartida].numJugadores++;
+			strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre,listaConectados.conectados[n].nombre);
+			sprintf(invitacion, "9/%d/%s\n", idPartida, nombreInvitador);
 			write(listaConectados.conectados[n].socket, invitacion, strlen(invitacion));
 			printf("Notificación enviada a %s\n", nombre);
 		}
 		i++;
+	}
+}
+
+void aceptarInvitacion(char *response, int socketOrigen){//10/idPartida/aceptado(1),rechazado(0)
+	int aceptado;
+	int idPartida;
+	char personaAceptado[80];
+	char mensaje[300];
+	idPartida = atoi(strtok(NULL, "/"));
+	aceptado = atoi(strtok(NULL, "/"));
+	
+	DameNombre(&listaConectados, socketOrigen, personaAceptado);
+	for(int i=0;i<listaPartidas.partidas[idPartida].numJugadores;i++){
+		if(strcmp(personaAceptado,listaPartidas.partidas[idPartida].jugadores[i].nombre)){
+			listaPartidas.partidas[idPartida].jugadores[i].aceptado=aceptado;
+		}
+		else if(aceptado){
+			sprintf(mensaje, "10/%d/%s\n",idPartida, personaAceptado);
+			int n = DamePosicion(&listaConectados, listaPartidas.partidas[idPartida].jugadores[i].nombre);
+			if (n != -1)
+			{
+				write(listaConectados.conectados[n].socket, mensaje, strlen(mensaje));
+				printf("Notificación aceptada por %s\n", listaPartidas.partidas[idPartida].jugadores[i].nombre);
+			}
+		}
+		
 	}
 }
 
@@ -348,7 +398,10 @@ void *atenderCliente(void *socket){
 			consultaBasicaLogros(buff2);
 		}
 		else if(codigo==8) {
-			invitacionjugadores(buff2, sock_conn);
+			invitacionJugadores(buff2, sock_conn);
+		}
+		else if(codigo==9){
+			aceptarInvitacion(buff2,sock_conn);
 		}
 		
 		//espera 1ms abans d'enviar la resposta per evitar que s'ajunti amb les notificacions
