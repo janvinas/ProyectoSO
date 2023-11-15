@@ -27,7 +27,6 @@ Versión 3 generada por Pau Serrano
 
 Versión 3 verificada por Jan Viñas
 
-
 Versión 3 comunicada por Carlos Muñoz
 
 https://www.youtube.com/watch?v=aCXUKQiNudY
@@ -35,3 +34,6 @@ https://www.youtube.com/watch?v=aCXUKQiNudY
 ---
 
 Versión 4 generada por Jan Viñas
+
+Versión 4 verificada por Carlos Muñoz
+
