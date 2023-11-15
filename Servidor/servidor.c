@@ -296,12 +296,13 @@ void consultaBasicaLogros(char *response){
 	}
 }
 
+
 void invitacionJugadores(char *response, int socketOrigen) {
 	int numInvitados;
 	char nombre[80];
 	char nombreInvitador[80];
 	numInvitados = atoi(strtok(NULL, "/"));
-	int i = 0;
+
 	char invitacion[300];
 	sprintf(response, "8/1"); // (/1 significa "Ya se ha invitado al resto de jugadores.")
 	DameNombre(&listaConectados, socketOrigen, nombreInvitador);
@@ -311,15 +312,19 @@ void invitacionJugadores(char *response, int socketOrigen) {
 	listaPartidas.partidas[idPartida].numJugadores = 1;
 	listaPartidas.numPartidas++;
 	
+	int i = 0;
 	while (i<numInvitados){
 		char *token = strtok(NULL,"/");
 		strcpy(nombre,token);
 		int n = DamePosicion(&listaConectados, nombre);
 		if (n != -1)
 		{
+			//añadir jugador a la lista de partidas
 			int numJugador = listaPartidas.partidas[idPartida].numJugadores;
+			strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, listaConectados.conectados[n].nombre);
 			listaPartidas.partidas[idPartida].numJugadores++;
-			strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre,listaConectados.conectados[n].nombre);
+
+			//enviar notificación al jugador
 			sprintf(invitacion, "9/%d/%s\n", idPartida, nombreInvitador);
 			write(listaConectados.conectados[n].socket, invitacion, strlen(invitacion));
 			printf("Notificación enviada a %s\n", nombre);
@@ -339,17 +344,20 @@ void aceptarInvitacion(char *response, int socketOrigen){//10/idPartida/aceptado
 	sprintf(response, "10/1");
 	
 	DameNombre(&listaConectados, socketOrigen, personaAceptado);
-	for(int i=0;i<listaPartidas.partidas[idPartida].numJugadores;i++){
-		if(strcmp(personaAceptado,listaPartidas.partidas[idPartida].jugadores[i].nombre)){
-			listaPartidas.partidas[idPartida].jugadores[i].aceptado=aceptado;
+	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
+		char jugadorActual[50];
+		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
+
+		if(strcmp(personaAceptado, jugadorActual) == 0){
+			listaPartidas.partidas[idPartida].jugadores[i].aceptado = aceptado;
 		}
 		else if(aceptado){
 			sprintf(mensaje, "11/%d/%s\n",idPartida, personaAceptado);
-			int n = DamePosicion(&listaConectados, listaPartidas.partidas[idPartida].jugadores[i].nombre);
+			int n = DamePosicion(&listaConectados, jugadorActual);
 			if (n != -1)
 			{
 				write(listaConectados.conectados[n].socket, mensaje, strlen(mensaje));
-				printf("Notificación aceptada por %s\n", listaPartidas.partidas[idPartida].jugadores[i].nombre);
+				printf("Notificación 'aceptar' enviada a %s\n", jugadorActual);
 			}
 		}
 		

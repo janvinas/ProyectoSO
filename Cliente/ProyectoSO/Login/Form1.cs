@@ -22,6 +22,8 @@ namespace Login
         Login loginForm;
         Signup signupForm;
         ConsultasBasicas consultasBasicasForm;
+
+        delegate void delegadoActualizarListaConectados(string text);
         public Form1()
         {
             InitializeComponent();
@@ -64,13 +66,15 @@ namespace Login
                         consultasBasicasForm.Consulta3(mensaje);
                         break;
                     case 7:
-                        actualizarListaConectados(mensaje);
+                        //actualizarListaConectados(mensaje);
+                        this.Invoke(new delegadoActualizarListaConectados(actualizarListaConectados),
+                            new object[] {mensaje});
                         break;
                     case 8:
                         MessageBox.Show("Has enviado una invitación!");
                         break;
                     case 9:
-                        MostrarNotificacionInvitacion(mensaje);
+                        this.Invoke(new Action(() => MostrarNotificacionInvitacion(mensaje) ));
                         break;
                     case 10:
                         //no hagas nada
