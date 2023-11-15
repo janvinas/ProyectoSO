@@ -38,6 +38,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.listaConectados = new System.Windows.Forms.DataGridView();
             this.Nombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.botonInvitar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.listaConectados)).BeginInit();
             this.SuspendLayout();
             // 
@@ -144,11 +145,22 @@
             this.Nombre.ReadOnly = true;
             this.Nombre.Width = 150;
             // 
+            // botonInvitar
+            // 
+            this.botonInvitar.Location = new System.Drawing.Point(25, 455);
+            this.botonInvitar.Name = "botonInvitar";
+            this.botonInvitar.Size = new System.Drawing.Size(180, 32);
+            this.botonInvitar.TabIndex = 9;
+            this.botonInvitar.Text = "Invitar seleccionados";
+            this.botonInvitar.UseVisualStyleBackColor = true;
+            this.botonInvitar.Click += new System.EventHandler(this.botonInvitar_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(902, 511);
+            this.Controls.Add(this.botonInvitar);
             this.Controls.Add(this.listaConectados);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.consultasBasicas);
@@ -180,6 +192,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.DataGridView listaConectados;
         private System.Windows.Forms.DataGridViewTextBoxColumn Nombre;
+        private System.Windows.Forms.Button botonInvitar;
     }
 }
 
