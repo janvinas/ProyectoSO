@@ -304,27 +304,6 @@ void invitacionjugadores(char *response, int socketOrigen) {
 	}
 }
 
-void invitacionjugadores(char *response, int socketOrigen) {
-	int numInvitados;
-	char nombre[80];
-	char nombreInvitador[80];
-	numInvitados = atoi(strtok(NULL, "/"));
-	int i = 0;
-	char invitacion;
-	char buff[512]; //petición
-	char buff2[512]; //respuesta
-		char *token = strtok(NULL,"/");
-		strcpy(nombre,token);
-		int n = DamePosicion(&listaConectados, nombre);
-		if (n != -1)
-		{
-			DameNombre(listaConectados, socketOrigen, nombreInvitador);
-			sprintf(invitacion, "%s%s\n", "9/",  nombreInvitador);
-			write(listaConectados.conectados[n].socket, invitacion, strlen(invitacion));
-			printf("Notificación enviada a %s\n", nombre);
-		}
-	}
-}
 
 /**
 * función que se ejecutará cada vez que un cliente se conecte y se cree un socket.
@@ -345,9 +324,6 @@ void *atenderCliente(void *socket){
 
 		char *token = strtok(buff, "/");
 		int codigo = atoi(token);
-		else if(codigo==8) {
-			invitacionjugadores(buff2, sock_conn);
-		}
 
 		if(codigo == 0){
 			close(sock_conn);
@@ -366,7 +342,7 @@ void *atenderCliente(void *socket){
 			existeUsuario(buff2);
 		}else if(codigo == 4){
 			consultaBasicaConstrucciones(buff2);
-	conn = mysql_real_connect(conn, "localhost", "root", "mysql", "T4_BBDDJuego", 0, NULL, 0);
+			conn = mysql_real_connect(conn, "localhost", "root", "mysql", "T4_BBDDJuego", 0, NULL, 0);
 			consultaBasicaDinero(buff2);
 		}else if(codigo==6){
 			consultaBasicaLogros(buff2);
@@ -375,7 +351,11 @@ void *atenderCliente(void *socket){
 			invitacionjugadores(buff2, sock_conn);
 		}
 		
-
+		//espera 1ms abans d'enviar la resposta per evitar que s'ajunti amb les notificacions
+		struct timespec tim, tim2;
+		tim.tv_sec = 0;
+		tim.tv_nsec = 1000000;
+		nanosleep(&tim, &tim2);
 		//imprimeix el buffer al socket i tanca'l
 		//la resposta només s'envia si el codi del missatge no és 0
 		write(sock_conn,buff2, strlen(buff2));
