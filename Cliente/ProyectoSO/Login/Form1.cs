@@ -19,9 +19,6 @@ namespace Login
         Socket server;
         Thread atender;
         string Usuario;
-        string Password;
-        string Mail;
-        string Genero;
         Login loginForm;
         Signup signupForm;
         ConsultasBasicas consultasBasicasForm;
@@ -70,13 +67,38 @@ namespace Login
                         actualizarListaConectados(mensaje);
                         break;
                     case 8:
-                        MessageBox.Show("Invitación enviada");
+                        MessageBox.Show("Has enviado una invitación!");
                         break;
                     case 9:
-                        MessageBox.Show("Te han invitado a una partida");
+                        MostrarNotificacionInvitacion(mensaje);
+                        break;
+                    case 10:
+                        //no hagas nada
+                        break;
+                    case 11:
+                        MessageBox.Show(mensaje.Split('/')[1] + " ha aceptado la invitación!");
                         break;
                 }
             }
+        }
+
+
+        private void MostrarNotificacionInvitacion(string mensaje)
+        {
+            int idPartida = Convert.ToInt32(mensaje.Split('/')[0]);
+            DialogResult res = MessageBox.Show(mensaje.Split('/')[1] + " te ha invitado a una partida! Aceptas?", "Invitación", MessageBoxButtons.YesNo);
+            string message;
+            if (res == DialogResult.Yes)
+            {
+                message = "10/" + idPartida + "/1";   //partida aceptada
+            }
+            else
+            {
+                message = "10/" + idPartida + "/0";   //partida rechazada
+            }
+
+            byte[] msg = Encoding.ASCII.GetBytes(message);
+            server.Send(msg);
         }
 
         private void Conectar_Click(object sender, EventArgs e)
@@ -138,7 +160,6 @@ namespace Login
             loginForm = new Login(server);
             loginForm.ShowDialog();
             Usuario = loginForm.GetUsuario();
-            Password = loginForm.GetPassword();
             login.Enabled = false;
         }
 
@@ -146,10 +167,6 @@ namespace Login
         {
             signupForm = new Signup(server);
             signupForm.ShowDialog();
-            Usuario= signupForm.GetUsuario();
-            Password= signupForm.GetPassword();
-            Mail = signupForm.GetMail();
-            Genero = signupForm.GetGenero();
         }
 
         private void consultasBasicas_Click(object sender, EventArgs e)
@@ -203,6 +220,7 @@ namespace Login
             string message = "8/" + listaConectados.SelectedCells.Count;
             foreach(DataGridViewCell cell in listaConectados.SelectedCells)
             {
+                if ( (string) cell.Value == Usuario) continue;
                 message += "/" + cell.Value;
             }
             byte[] msg = Encoding.ASCII.GetBytes(message);

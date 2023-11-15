@@ -335,6 +335,8 @@ void aceptarInvitacion(char *response, int socketOrigen){//10/idPartida/aceptado
 	char mensaje[300];
 	idPartida = atoi(strtok(NULL, "/"));
 	aceptado = atoi(strtok(NULL, "/"));
+
+	sprintf(response, "10/1");
 	
 	DameNombre(&listaConectados, socketOrigen, personaAceptado);
 	for(int i=0;i<listaPartidas.partidas[idPartida].numJugadores;i++){
@@ -342,7 +344,7 @@ void aceptarInvitacion(char *response, int socketOrigen){//10/idPartida/aceptado
 			listaPartidas.partidas[idPartida].jugadores[i].aceptado=aceptado;
 		}
 		else if(aceptado){
-			sprintf(mensaje, "10/%d/%s\n",idPartida, personaAceptado);
+			sprintf(mensaje, "11/%d/%s\n",idPartida, personaAceptado);
 			int n = DamePosicion(&listaConectados, listaPartidas.partidas[idPartida].jugadores[i].nombre);
 			if (n != -1)
 			{
@@ -400,7 +402,7 @@ void *atenderCliente(void *socket){
 		else if(codigo==8) {
 			invitacionJugadores(buff2, sock_conn);
 		}
-		else if(codigo==9){
+		else if(codigo==10){
 			aceptarInvitacion(buff2,sock_conn);
 		}
 		
