@@ -39,6 +39,9 @@
             this.listaConectados = new System.Windows.Forms.DataGridView();
             this.Nombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.botonInvitar = new System.Windows.Forms.Button();
+            this.frase = new System.Windows.Forms.TextBox();
+            this.textoEnviado = new System.Windows.Forms.Label();
+            this.enviar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.listaConectados)).BeginInit();
             this.SuspendLayout();
             // 
@@ -104,7 +107,7 @@
             // consultasBasicas
             // 
             this.consultasBasicas.Enabled = false;
-            this.consultasBasicas.Location = new System.Drawing.Point(610, 271);
+            this.consultasBasicas.Location = new System.Drawing.Point(277, 346);
             this.consultasBasicas.Name = "consultasBasicas";
             this.consultasBasicas.Size = new System.Drawing.Size(174, 48);
             this.consultasBasicas.TabIndex = 6;
@@ -155,11 +158,40 @@
             this.botonInvitar.UseVisualStyleBackColor = true;
             this.botonInvitar.Click += new System.EventHandler(this.botonInvitar_Click);
             // 
+            // frase
+            // 
+            this.frase.Location = new System.Drawing.Point(669, 357);
+            this.frase.Name = "frase";
+            this.frase.Size = new System.Drawing.Size(184, 26);
+            this.frase.TabIndex = 10;
+            // 
+            // textoEnviado
+            // 
+            this.textoEnviado.Location = new System.Drawing.Point(665, 138);
+            this.textoEnviado.MaximumSize = new System.Drawing.Size(300, 300);
+            this.textoEnviado.Name = "textoEnviado";
+            this.textoEnviado.Size = new System.Drawing.Size(188, 199);
+            this.textoEnviado.TabIndex = 11;
+            this.textoEnviado.Text = "*Chat*";
+            // 
+            // enviar
+            // 
+            this.enviar.Location = new System.Drawing.Point(669, 389);
+            this.enviar.Name = "enviar";
+            this.enviar.Size = new System.Drawing.Size(95, 36);
+            this.enviar.TabIndex = 12;
+            this.enviar.Text = "Enviar";
+            this.enviar.UseVisualStyleBackColor = true;
+            this.enviar.Click += new System.EventHandler(this.enviar_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(902, 511);
+            this.Controls.Add(this.enviar);
+            this.Controls.Add(this.textoEnviado);
+            this.Controls.Add(this.frase);
             this.Controls.Add(this.botonInvitar);
             this.Controls.Add(this.listaConectados);
             this.Controls.Add(this.button1);
@@ -193,6 +225,9 @@
         private System.Windows.Forms.DataGridView listaConectados;
         private System.Windows.Forms.DataGridViewTextBoxColumn Nombre;
         private System.Windows.Forms.Button botonInvitar;
+        private System.Windows.Forms.TextBox frase;
+        private System.Windows.Forms.Label textoEnviado;
+        private System.Windows.Forms.Button enviar;
     }
 }
 

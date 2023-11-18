@@ -369,14 +369,13 @@ void enviarFrase(char *response, int socketOrigen){
 	char nombreEnviador[80];
 	char mensaje[300];
 	idPartida = atoi(strtok(NULL, "/"));
-	p=strtok(NULL,"/");
-	strcpy(frase,p);
+	strcpy(frase,strtok(NULL,"/"));
 	sprintf(response,"12/1");
 	DameNombre(&listaConectados, socketOrigen, nombreEnviador);
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
 		char jugadorActual[50];
 		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
-		sprintf(mensaje, "12/%s/%s\n", nombreEnviador, frase);
+		sprintf(mensaje, "13/%s/%s\n", nombreEnviador, frase);
 		int n = DamePosicion(&listaConectados, jugadorActual);
 		if (n != -1)
 			{
@@ -433,7 +432,7 @@ void *atenderCliente(void *socket){
 
 		if(ret == 0){
 			//0 bytes significa que el cliente se ha desconectado (equivalente a que mande un código 0/ )
-			desconectarCliente(sock_conn, true);
+			desconectarCliente(sock_conn, 1);
 			break;
 		}else if(ret < 0){
 			//ha ocurrido un error leyendo el socket. Imprime el error por consola:
@@ -446,7 +445,7 @@ void *atenderCliente(void *socket){
 		int codigo = atoi(token);
 
 		if(codigo == 0){
-			desconectarCliente(sock_conn, false);
+			desconectarCliente(sock_conn, 0);
 			break;
 		}else if (codigo ==1){
 			login(buff2, sock_conn, &listaConectados);

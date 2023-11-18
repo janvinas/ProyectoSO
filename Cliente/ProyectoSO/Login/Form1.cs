@@ -22,6 +22,7 @@ namespace Login
         Login loginForm;
         Signup signupForm;
         ConsultasBasicas consultasBasicasForm;
+        int idPartida;
 
         delegate void delegadoActualizarListaConectados(string text);
         public Form1()
@@ -36,60 +37,80 @@ namespace Login
             signup.Enabled = false;
         }
 
+
+        int receiveBufferPosition = 0;
+        byte[] receiveBuffer = new byte[1024];
         private void AtenderServidor()
         {
             while (true)
             {
-                byte[] msg2 = new byte[300];
-                server.Receive(msg2);
-                string[] trozos = Encoding.ASCII.GetString(msg2).Split(new[] { '/' }, 2);
-                int codigo = Convert.ToInt32(trozos[0]);
-                string mensaje = trozos[1].Split('\0')[0];
-                switch (codigo)
+                if (server == null || !server.Connected) return;
+
+                server.Receive(receiveBuffer, receiveBufferPosition, 1, SocketFlags.None);
+
+                if (receiveBuffer[receiveBufferPosition] == '\n')
                 {
-                    case 1:
-                        loginForm.onResponse(mensaje);
-                        break;
-                    case 2:
-                        signupForm.onResponse(mensaje);
-                        break;
-                    case 3:
-                        signupForm.onResponseColor(mensaje);
-                        break;
-                    case 4:
-                        consultasBasicasForm.Consulta1(mensaje);
-                        break;
-                    case 5:
-                        consultasBasicasForm.Consulta2(mensaje);
-                        break;
-                    case 6:
-                        consultasBasicasForm.Consulta3(mensaje);
-                        break;
-                    case 7:
-                        //actualizarListaConectados(mensaje);
-                        this.Invoke(new delegadoActualizarListaConectados(actualizarListaConectados),
-                            new object[] {mensaje});
-                        break;
-                    case 8:
-                        MessageBox.Show("Has enviado una invitación!");
-                        break;
-                    case 9:
-                        this.Invoke(new Action(() => MostrarNotificacionInvitacion(mensaje) ));
-                        break;
-                    case 10:
-                        //no hagas nada
-                        break;
-                    case 11:
-                        MessageBox.Show(mensaje.Split('/')[1] + " ha aceptado la invitación!");
-                        break;
+                    string respuesta = Encoding.ASCII.GetString(receiveBuffer, 0, receiveBufferPosition).Split('\0')[0];
+                    string[] trozos = respuesta.Split(new[] { '/' }, 2);
+                    int codigo = Convert.ToInt32(trozos[0]);
+                    string mensaje = trozos[1].Split('\0')[0];
+                    switch (codigo)
+                    {
+                        case 1:
+                            loginForm.onResponse(mensaje);
+                            break;
+                        case 2:
+                            signupForm.onResponse(mensaje);
+                            break;
+                        case 3:
+                            signupForm.onResponseColor(mensaje);
+                            break;
+                        case 4:
+                            consultasBasicasForm.Consulta1(mensaje);
+                            break;
+                        case 5:
+                            consultasBasicasForm.Consulta2(mensaje);
+                            break;
+                        case 6:
+                            consultasBasicasForm.Consulta3(mensaje);
+                            break;
+                        case 7:
+                            //actualizarListaConectados(mensaje);
+                            this.Invoke(new delegadoActualizarListaConectados(actualizarListaConectados),
+                                new object[] { mensaje });
+                            break;
+                        case 8:
+                            MessageBox.Show("Has enviado una invitación!");
+                            break;
+                        case 9:
+                            this.Invoke(new Action(() => MostrarNotificacionInvitacion(mensaje)));
+                            break;
+                        case 10:
+                            //no hagas nada
+                            break;
+                        case 11:
+                            MessageBox.Show(mensaje.Split('/')[1] + " ha aceptado la invitación!");
+                            break;
+                        case 12:
+                            //No hagas nada
+                            break;
+                        case 13:
+                            EscribirMensaje(mensaje);
+                            break;
+                    }
+                    receiveBufferPosition = 0;
+                }
+                else
+                {
+                    receiveBufferPosition++;
                 }
             }
-        }
 
+        }
 
         private void MostrarNotificacionInvitacion(string mensaje)
         {
-            int idPartida = Convert.ToInt32(mensaje.Split('/')[0]);
+            idPartida = Convert.ToInt32(mensaje.Split('/')[0]);
             DialogResult res = MessageBox.Show(mensaje.Split('/')[1] + " te ha invitado a una partida! Aceptas?", "Invitación", MessageBoxButtons.YesNo);
             string message;
             if (res == DialogResult.Yes)
@@ -229,6 +250,20 @@ namespace Login
             }
             byte[] msg = Encoding.ASCII.GetBytes(message);
             server.Send(msg);
+        }
+
+        private void enviar_Click(object sender, EventArgs e)
+        {
+            string mensaje = "12/" + idPartida + "/" + frase.Text;
+            frase.Text = "";
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+        }
+        private void EscribirMensaje(string mensaje)
+        {
+            string nombreEscritor = mensaje.Split('/')[0];
+            string fraseEscritor = mensaje.Split('/')[1];
+            textoEnviado.Text = textoEnviado.Text + '\n' + nombreEscritor + ": " + fraseEscritor;
         }
     }
 }
