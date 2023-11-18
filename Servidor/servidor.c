@@ -363,6 +363,28 @@ void aceptarInvitacion(char *response, int socketOrigen){//10/idPartida/aceptado
 		
 	}
 }
+void enviarFrase(char *response, int socketOrigen){
+	char frase[100];
+	int idPartida;
+	char nombreEnviador[80];
+	char mensaje[300];
+	idPartida = atoi(strtok(NULL, "/"));
+	p=strtok(NULL,"/");
+	strcpy(frase,p);
+	sprintf(response,"12/1");
+	DameNombre(&listaConectados, socketOrigen, nombreEnviador);
+	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
+		char jugadorActual[50];
+		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
+		sprintf(mensaje, "12/%s/%s\n", nombreEnviador, frase);
+		int n = DamePosicion(&listaConectados, jugadorActual);
+		if (n != -1)
+			{
+				write(listaConectados.conectados[n].socket, mensaje, strlen(mensaje));
+				printf("Frase enviada a %s\n", jugadorActual);
+			}
+	}
+}
 
 
 /**
@@ -391,6 +413,7 @@ void desconectarCliente(int sock_conn, char forced){
 		printf(".\n");
 	}
 }
+
 
 
 /**
@@ -443,6 +466,9 @@ void *atenderCliente(void *socket){
 		}
 		else if(codigo==10){
 			aceptarInvitacion(buff2,sock_conn);
+		}
+		else if(codigo==12){
+			enviarFrase(buff2,sock_conn);
 		}
 		
 		//imprimeix el buffer al socket i tanca'l
