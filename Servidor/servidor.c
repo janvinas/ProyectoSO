@@ -96,8 +96,8 @@ int eliminarConectado (ListaConectados *lista, char nombre[50])
 	if (pos == -1)
 		return -1;
 	else {
-		int i;
-		for (i = pos; i < lista -> num-1; i++)
+
+		for (int i = pos; i < lista -> num-1; i++)
 		{
 			strcpy(lista -> conectados[i].nombre, lista -> conectados[i+1].nombre);
 			lista -> conectados[i].socket = lista -> conectados[i+1].socket;
@@ -113,8 +113,7 @@ void DameConectados(ListaConectados * lista, char conectados[300]) {
 	//Pone en conectados los nombres de todos los conectados separados por /
 	// "7/n/Juan/Maria/Pedro"
 	sprintf(conectados, "7/%d", lista -> num);
-	int i;
-	for (i=0; i < lista -> num; i++)
+	for (int i=0; i < lista -> num; i++)
 		sprintf (conectados, "%s/%s", conectados, lista->conectados[i].nombre);
 }
 
@@ -125,6 +124,7 @@ void DameConectados(ListaConectados * lista, char conectados[300]) {
 void enviarConectados(){
 	char stringConectados[300];
 	DameConectados(&listaConectados, stringConectados);
+	sprintf(stringConectados, "%s\n", stringConectados);
 	for(int i = 0; i < listaConectados.num; i++){
 		write(listaConectados.conectados[i].socket, stringConectados, strlen(stringConectados));
 	}
@@ -366,6 +366,34 @@ void aceptarInvitacion(char *response, int socketOrigen){//10/idPartida/aceptado
 
 
 /**
+ * Se ejecuta cuando un cliente se ha desconectado. Elimina la entrada de la lista de conectados
+ * si tenía la sesión iniciada.
+ * 
+ * @param forced Poner a true si la desconexión ha sido forzosa (se imprime un mensaje en la consola).
+*/
+void desconectarCliente(int sock_conn, char forced){
+	close(sock_conn);
+
+	char nombre[50];
+	int err = DameNombre(&listaConectados, sock_conn, nombre);
+	if(err == 0){
+		//si el cliente que se ha desconectado tenía sesión iniciada, ciérrala.
+		eliminarConectado(&listaConectados, nombre);
+		enviarConectados();	//envía una notificación a todos los usuarios con la nueva lista de conectados
+		printf("Cliente %s desconectado", nombre);
+	}else{
+		printf("Cliente sin sesión iniciada desconectado");
+	}
+
+	if(forced){
+		printf(" forzosamente.\n");
+	}else{
+		printf(".\n");
+	}
+}
+
+
+/**
 * función que se ejecutará cada vez que un cliente se conecte y se cree un socket.
 * la función termina cuando el cliente se desconecta.
 */
@@ -380,19 +408,22 @@ void *atenderCliente(void *socket){
 		//posa un valor 0 al final per acabar la string
 		buff[ret]='\0';
 
+		if(ret == 0){
+			//0 bytes significa que el cliente se ha desconectado (equivalente a que mande un código 0/ )
+			desconectarCliente(sock_conn, true);
+			break;
+		}else if(ret < 0){
+			//ha ocurrido un error leyendo el socket. Imprime el error por consola:
+			printf("Ha ocurrido un error leyendo el socket");
+		}
+
 		printf("Mensaje recibido!: %s\n", buff);
 
 		char *token = strtok(buff, "/");
 		int codigo = atoi(token);
 
 		if(codigo == 0){
-			close(sock_conn);
-			char nombre[50];
-		
-			DameNombre(&listaConectados, sock_conn, nombre);
-			eliminarConectado(&listaConectados, nombre);
-			enviarConectados();	//envía una notificación a todos los usuarios con la nueva lista de conectados
-			printf("Cliente desconectado\n");
+			desconectarCliente(sock_conn, false);
 			break;
 		}else if (codigo ==1){
 			login(buff2, sock_conn, &listaConectados);
@@ -414,15 +445,11 @@ void *atenderCliente(void *socket){
 			aceptarInvitacion(buff2,sock_conn);
 		}
 		
-		//espera 1ms abans d'enviar la resposta per evitar que s'ajunti amb les notificacions
-		struct timespec tim, tim2;
-		tim.tv_sec = 0;
-		tim.tv_nsec = 1000000;
-		nanosleep(&tim, &tim2);
 		//imprimeix el buffer al socket i tanca'l
 		//la resposta només s'envia si el codi del missatge no és 0
+		sprintf(buff2, "%s\n", buff2);	//afegeix un salt de línia per indicar final del missatge
 		write(sock_conn,buff2, strlen(buff2));
-		printf("Respuesta enviada!: %s\n", buff2);
+		printf("Respuesta enviada!: %s", buff2);	//no cal fer un altre salt de línia, buff2 sempre acaba en un
 	}
 }
 
