@@ -304,13 +304,14 @@ void invitacionJugadores(char *response, int socketOrigen) {
 	numInvitados = atoi(strtok(NULL, "/"));
 
 	char invitacion[300];
-	sprintf(response, "8/1"); // (/1 significa "Ya se ha invitado al resto de jugadores.")
 	DameNombre(&listaConectados, socketOrigen, nombreInvitador);
 	
 	int idPartida = listaPartidas.numPartidas;
 	strcpy(listaPartidas.partidas[idPartida].jugadores[0].nombre, nombreInvitador);
 	listaPartidas.partidas[idPartida].numJugadores = 1;
 	listaPartidas.numPartidas++;
+
+	sprintf(response, "8/%d", idPartida); // se envía de vuelta el ID de partida
 	
 	int i = 0;
 	while (i<numInvitados){
