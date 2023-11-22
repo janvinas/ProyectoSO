@@ -365,24 +365,46 @@ void aceptarInvitacion(char *response, int socketOrigen){//10/idPartida/aceptado
 	}
 }
 void enviarFrase(char *response, int socketOrigen){
-	char frase[100];
-	int idPartida;
+	char *token;
+	token = strtok(NULL, "/");
+	if(token == NULL){
+		sprintf(response, "12/0");
+		return;
+	}
+	int idPartida = atoi(token);
+
+	token = strtok(NULL, "/");
+	if(token == NULL){
+		sprintf(response, "12/0");
+		return;
+	}
 	char nombreEnviador[80];
-	char mensaje[300];
-	idPartida = atoi(strtok(NULL, "/"));
-	strcpy(frase,strtok(NULL,"/"));
+	strcpy(nombreEnviador, token);
+
+	token = strtok(NULL, "/");
+	if(token == NULL){
+		sprintf(response, "12/0");
+		return;
+	}
+	char frase[200];
+	strcpy(frase, token);
+
+	//ningún error ha ocurrido, imprimimos 12/1
 	sprintf(response,"12/1");
-	DameNombre(&listaConectados, socketOrigen, nombreEnviador);
+
+	char notificacion[300];	
+	sprintf(notificacion, "13/%s/%s\n", nombreEnviador, frase);
+
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
 		char jugadorActual[50];
 		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
-		sprintf(mensaje, "13/%s/%s\n", nombreEnviador, frase);
 		int n = DamePosicion(&listaConectados, jugadorActual);
+
 		if (n != -1)
-			{
-				write(listaConectados.conectados[n].socket, mensaje, strlen(mensaje));
-				printf("Frase enviada a %s\n", jugadorActual);
-			}
+		{
+			write(listaConectados.conectados[n].socket, notificacion, strlen(notificacion));
+			printf("Frase enviada a %s\n", jugadorActual);
+		}
 	}
 }
 
@@ -456,7 +478,7 @@ void *atenderCliente(void *socket){
 			existeUsuario(buff2);
 		}else if(codigo == 4){
 			consultaBasicaConstrucciones(buff2);
-			conn = mysql_real_connect(conn, "localhost", "root", "mysql", "T4_BBDDJuego", 0, NULL, 0);
+		}else if(codigo == 5){
 			consultaBasicaDinero(buff2);
 		}else if(codigo==6){
 			consultaBasicaLogros(buff2);
