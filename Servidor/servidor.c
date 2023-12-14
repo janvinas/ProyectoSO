@@ -20,6 +20,8 @@ typedef struct{
 typedef struct{
 	char nombre[80];
 	char aceptado;
+	double x;
+	double y;
 }Jugador;
 typedef struct{
 	Jugador jugadores[20];
@@ -58,6 +60,7 @@ int addConectado (ListaConectados *lista, char nombre[50], int socket) {
 		return 0;
 	}
 }
+
 int DameNombre (ListaConectados *lista, int socket, char nombre[50]) {
 	int i=0;
 	int encontrado = 0;
@@ -107,7 +110,6 @@ int eliminarConectado (ListaConectados *lista, char nombre[50])
 	
 	}
 }
-
 
 void DameConectados(ListaConectados * lista, char conectados[300]) {
 	//Pone en conectados los nombres de todos los conectados separados por /
@@ -323,6 +325,9 @@ void invitacionJugadores(char *response, int socketOrigen) {
 			//añadir jugador a la lista de partidas
 			int numJugador = listaPartidas.partidas[idPartida].numJugadores;
 			strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, listaConectados.conectados[n].nombre);
+			listaPartidas.partidas[idPartida].jugadores[numJugador].x = 0;
+			listaPartidas.partidas[idPartida].jugadores[numJugador].y = 0;
+			listaPartidas.partidas[idPartida].jugadores[numJugador].aceptado = 0;
 			listaPartidas.partidas[idPartida].numJugadores++;
 
 			//enviar notificación al jugador
@@ -436,6 +441,32 @@ void desconectarCliente(int sock_conn, char forced){
 	}
 }
 
+void actualizarPosicion(char *response, int sock_conn){
+	int idPartida = atoi(strtok(NULL, "/"));
+	char nombreUsuario[50];
+	strcpy(nombreUsuario, strtok(NULL, "/"));
+	double x = atof(strtok(NULL, "/"));
+	double y = atof(strtok(NULL, "/"));
+
+	sprintf(response, "13");
+	printf("%s\n", response);
+	if(idPartida == -1) return;
+
+	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
+		if(strcmp(listaPartidas.partidas[idPartida].jugadores[i].nombre, nombreUsuario) == 0){
+			//jugador que ha mandado su posición. La actualizamos
+			listaPartidas.partidas[idPartida].jugadores[i].x = x;
+			listaPartidas.partidas[idPartida].jugadores[i].y = y;
+		}else{
+			//para los demás jugadores, añadimos su nombre y posicion a la respuesta
+			sprintf(response, "%s/%s/%f/%f", response, 
+				listaPartidas.partidas[idPartida].jugadores[i].nombre,
+				listaPartidas.partidas[idPartida].jugadores[i].x,
+				listaPartidas.partidas[idPartida].jugadores[i].y);
+		}
+	}
+}
+
 
 
 /**
@@ -492,12 +523,18 @@ void *atenderCliente(void *socket){
 		else if(codigo==12){
 			enviarFrase(buff2,sock_conn);
 		}
+		else if(codigo==13){
+			actualizarPosicion(buff2, sock_conn);
+		}
+		else{
+			continue;
+		}
 		
 		//imprimeix el buffer al socket i tanca'l
 		//la resposta només s'envia si el codi del missatge no és 0
 		sprintf(buff2, "%s\n", buff2);	//afegeix un salt de línia per indicar final del missatge
 		write(sock_conn,buff2, strlen(buff2));
-		printf("Respuesta enviada!: %s", buff2);	//no cal fer un altre salt de línia, buff2 sempre acaba en un
+		//printf("Respuesta enviada!: %s", buff2);	//no cal fer un altre salt de línia, buff2 sempre acaba en un
 	}
 }
 
@@ -519,7 +556,7 @@ int main(int argc, char *charv[]){
 	struct sockaddr_in serv_adr;
 	
 	if((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0){
-		printf("Error creant socket");
+		printf("Error creant socket\n");
 		exit(-1);
 	}
 
@@ -529,12 +566,12 @@ int main(int argc, char *charv[]){
 	serv_adr.sin_port = htons(9050);
 
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0){
-		printf ("Error al bind");
+		printf ("Error al bind\n");
 		exit(-1);
 	}
 	//La cola de peticiones pendientes no podr? ser superior a 4 --> no sería 2 ???
 	if (listen(sock_listen, 2) < 0){
-		printf("Error en el Listen");
+		printf("Error en el Listen\n");
 		exit(-1);
 	}
 
