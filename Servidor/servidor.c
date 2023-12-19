@@ -523,7 +523,7 @@ void *atenderCliente(void *socket){
 		else if(codigo==12){
 			enviarFrase(buff2,sock_conn);
 		}
-		else if(codigo==13){
+		else if(codigo==14){
 			actualizarPosicion(buff2, sock_conn);
 		}
 		else{
