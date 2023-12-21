@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <pthread.h>
 
+#define DEBUG 0
+
 typedef struct{
 	char nombre [50];
 	int socket;
@@ -448,7 +450,7 @@ void actualizarPosicion(char *response, int sock_conn){
 	double x = atof(strtok(NULL, "/"));
 	double y = atof(strtok(NULL, "/"));
 
-	sprintf(response, "13");
+	sprintf(response, "14");
 	printf("%s\n", response);
 	if(idPartida == -1) return;
 
@@ -463,6 +465,42 @@ void actualizarPosicion(char *response, int sock_conn){
 				listaPartidas.partidas[idPartida].jugadores[i].nombre,
 				listaPartidas.partidas[idPartida].jugadores[i].x,
 				listaPartidas.partidas[idPartida].jugadores[i].y);
+		}
+	}
+}
+
+void iniciarPartida(char *response, int sock_conn){
+	char *token;
+
+	token = strtok(NULL, "/");
+	if(token == NULL){
+		sprintf(response, "15/0");
+		return;
+	}
+	int idPartida = atoi(token);
+
+	token = strtok(NULL, "/");
+	if(token == NULL){
+		sprintf(response, "15/0");
+		return;
+	}
+	char mapa[50];
+	strcpy(mapa, token);
+
+	sprintf(response, "15/1");
+
+	char notificacion[60];	
+	sprintf(notificacion, "16/%s\n", mapa);
+
+	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
+		char jugadorActual[50];
+		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
+		int n = DamePosicion(&listaConectados, jugadorActual);
+
+		if (n != -1)
+		{
+			write(listaConectados.conectados[n].socket, notificacion, strlen(notificacion));
+			printf("Inicio de partida enviado a %s\n", jugadorActual);
 		}
 	}
 }
@@ -493,7 +531,7 @@ void *atenderCliente(void *socket){
 			printf("Ha ocurrido un error leyendo el socket");
 		}
 
-		printf("Mensaje recibido!: %s\n", buff);
+		if(DEBUG) printf("Mensaje recibido!: %s\n", buff);
 
 		char *token = strtok(buff, "/");
 		int codigo = atoi(token);
@@ -525,6 +563,9 @@ void *atenderCliente(void *socket){
 		}
 		else if(codigo==14){
 			actualizarPosicion(buff2, sock_conn);
+		}
+		else if(codigo==15){
+			iniciarPartida(buff2, sock_conn);
 		}
 		else{
 			continue;
