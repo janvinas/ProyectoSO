@@ -25,6 +25,7 @@ typedef struct{
 	double x;
 	double y;
 	double rot;
+	double tiempoFinal;
 }Jugador;
 typedef struct{
 	Jugador jugadores[20];
@@ -332,6 +333,7 @@ void invitacionJugadores(char *response, int socketOrigen) {
 			listaPartidas.partidas[idPartida].jugadores[numJugador].y = 0;
 			listaPartidas.partidas[idPartida].jugadores[numJugador].rot = 180;
 			listaPartidas.partidas[idPartida].jugadores[numJugador].aceptado = 0;
+			listaPartidas.partidas[idPartida].jugadores[numJugador].tiempoFinal = -1;
 			listaPartidas.partidas[idPartida].numJugadores++;
 
 			//enviar notificación al jugador
@@ -343,7 +345,7 @@ void invitacionJugadores(char *response, int socketOrigen) {
 	}
 }
 
-void aceptarInvitacion(char *response, int socketOrigen){//10/idPartida/aceptado(1),rechazado(0)
+void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptado(1),rechazado(0)
 	int aceptado;
 	int idPartida;
 	char personaAceptado[80];
@@ -454,7 +456,6 @@ void actualizarPosicion(char *response, int sock_conn){
 	double rot = atof(strtok(NULL, "/"));
 
 	sprintf(response, "14");
-	printf("%s\n", response);
 	if(idPartida == -1) return;
 
 	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
@@ -508,6 +509,37 @@ void iniciarPartida(char *response, int sock_conn){
 			printf("Inicio de partida enviado a %s\n", jugadorActual);
 		}
 	}
+}
+
+void acabarCarrera(char *response, int sock_conn){
+	int idPartida = atoi(strtok(NULL, "/"));
+	char nombreUsuario[50];
+	strcpy(nombreUsuario, strtok(NULL, "/"));
+	float tiempo = atof(strtok(NULL, "/"));
+
+	sprintf(response, "17/1");
+
+	//busca el jugador y añade su tiempo final
+	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
+		if(strcmp(listaPartidas.partidas[idPartida].jugadores[i].nombre, nombreUsuario) == 0){
+			listaPartidas.partidas[idPartida].jugadores[i].tiempoFinal = tiempo;
+		} 
+	}
+
+	char notificacion[50];
+	sprintf(notificacion, "18/%s/%f", nombreUsuario, tiempo);
+
+	//envía una notificación a los demás jugadores
+	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
+		if(strcmp(listaPartidas.partidas[idPartida].jugadores[i].nombre, nombreUsuario) != 0){
+			char jugadorActual[50];
+			strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
+			int n = DamePosicion(&listaConectados, jugadorActual);
+
+			if (n != -1) write(listaConectados.conectados[n].socket, notificacion, strlen(notificacion));
+		} 
+	}
+
 }
 
 
@@ -571,6 +603,9 @@ void *atenderCliente(void *socket){
 		}
 		else if(codigo==15){
 			iniciarPartida(buff2, sock_conn);
+		}
+		else if(codigo=17){
+			acabarCarrera(buff2, sock_conn);
 		}
 		else{
 			continue;
