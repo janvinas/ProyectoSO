@@ -24,6 +24,7 @@ typedef struct{
 	char aceptado;
 	double x;
 	double y;
+	double rot;
 }Jugador;
 typedef struct{
 	Jugador jugadores[20];
@@ -329,6 +330,7 @@ void invitacionJugadores(char *response, int socketOrigen) {
 			strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, listaConectados.conectados[n].nombre);
 			listaPartidas.partidas[idPartida].jugadores[numJugador].x = 0;
 			listaPartidas.partidas[idPartida].jugadores[numJugador].y = 0;
+			listaPartidas.partidas[idPartida].jugadores[numJugador].rot = 180;
 			listaPartidas.partidas[idPartida].jugadores[numJugador].aceptado = 0;
 			listaPartidas.partidas[idPartida].numJugadores++;
 
@@ -449,6 +451,7 @@ void actualizarPosicion(char *response, int sock_conn){
 	strcpy(nombreUsuario, strtok(NULL, "/"));
 	double x = atof(strtok(NULL, "/"));
 	double y = atof(strtok(NULL, "/"));
+	double rot = atof(strtok(NULL, "/"));
 
 	sprintf(response, "14");
 	printf("%s\n", response);
@@ -459,12 +462,14 @@ void actualizarPosicion(char *response, int sock_conn){
 			//jugador que ha mandado su posición. La actualizamos
 			listaPartidas.partidas[idPartida].jugadores[i].x = x;
 			listaPartidas.partidas[idPartida].jugadores[i].y = y;
+			listaPartidas.partidas[idPartida].jugadores[i].rot = rot;
 		}else{
 			//para los demás jugadores, añadimos su nombre y posicion a la respuesta
-			sprintf(response, "%s/%s/%f/%f", response, 
+			sprintf(response, "%s/%s/%f/%f/%f", response, 
 				listaPartidas.partidas[idPartida].jugadores[i].nombre,
 				listaPartidas.partidas[idPartida].jugadores[i].x,
-				listaPartidas.partidas[idPartida].jugadores[i].y);
+				listaPartidas.partidas[idPartida].jugadores[i].y,
+				listaPartidas.partidas[idPartida].jugadores[i].rot);
 		}
 	}
 }
