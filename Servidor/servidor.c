@@ -530,15 +530,13 @@ void acabarCarrera(char *response, int sock_conn){
 	char notificacion[50];
 	sprintf(notificacion, "18/%s/%f/%f", nombreUsuario, tiempo, mejorTiempo);
 
-	//envía una notificación a los demás jugadores
+	//envía una notificación a todos los jugadores
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
-		if(strcmp(listaPartidas.partidas[idPartida].jugadores[i].nombre, nombreUsuario) != 0){
-			char jugadorActual[50];
-			strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
-			int n = DamePosicion(&listaConectados, jugadorActual);
+		char jugadorActual[50];
+		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
+		int n = DamePosicion(&listaConectados, jugadorActual);
 
-			if (n != -1) write(listaConectados.conectados[n].socket, notificacion, strlen(notificacion));
-		} 
+		if (n != -1) write(listaConectados.conectados[n].socket, notificacion, strlen(notificacion));
 	}
 
 }
