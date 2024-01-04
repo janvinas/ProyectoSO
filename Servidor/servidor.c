@@ -516,7 +516,8 @@ void acabarCarrera(char *response, int sock_conn){
 	char nombreUsuario[50];
 	strcpy(nombreUsuario, strtok(NULL, "/"));
 	float tiempo = atof(strtok(NULL, "/"));
-
+	float mejorTiempo = atof(strtok(NULL, "/"));
+	
 	sprintf(response, "17/1");
 
 	//busca el jugador y añade su tiempo final
@@ -527,7 +528,7 @@ void acabarCarrera(char *response, int sock_conn){
 	}
 
 	char notificacion[50];
-	sprintf(notificacion, "18/%s/%f", nombreUsuario, tiempo);
+	sprintf(notificacion, "18/%s/%f/%f", nombreUsuario, tiempo, mejorTiempo);
 
 	//envía una notificación a los demás jugadores
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
