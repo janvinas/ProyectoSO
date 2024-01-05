@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 typedef struct{
 	char nombre [50];
@@ -225,6 +225,9 @@ void existeUsuario(char *response){
 
 
 
+
+
+
 void invitacionJugadores(char *response, int socketOrigen) {
 	int numInvitados;
 	char nombre[80];
@@ -438,6 +441,51 @@ void iniciarPartida(char *response, int sock_conn){
 	}
 }
 
+void ordenarJugadores(int idPartida){
+	// reparte tantas posiciones como jugadores haya en la partida
+	for(int posicion = 1; posicion <= listaPartidas.partidas[idPartida].numJugadores; posicion++){
+
+		//para asignar una posicion, itera sobre todos los jugadores no asignados y encuentra el mejor tiempo.
+		float mejorTiempo = 1e10;
+		int mejorJugador = -1;
+		for(int jugador = 0; jugador < listaPartidas.partidas[idPartida].numJugadores; jugador++){
+			Jugador j = listaPartidas.partidas[idPartida].jugadores[jugador];
+			//si encuentra un jugador mejor del que tenía, actualizalo (no tiene posición asignada y ha acabado la partida)
+			if(j.posicion == 0 && j.tiempoFinal != 0 && j.tiempoFinal < mejorTiempo){
+				mejorTiempo = j.tiempoFinal;
+				mejorJugador = jugador;
+			}
+		}
+
+		//asigna la posicion correspondiente al jugador elegido:
+		if(mejorJugador != -1){
+			listaPartidas.partidas[idPartida].jugadores[mejorJugador].posicion = posicion;
+		}
+	}
+}
+
+void acabarPartida(int idPartida){
+	char query[500];
+	sprintf(query, "INSERT INTO Partidas (HFin) VALUES (NOW());");
+	mysql_query(conn, query);
+
+	sprintf(query, "SELECT LAST_INSERT_ID();");
+	mysql_query(conn, query);
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+	int idPartidaBD = atoi(row[0]);
+
+	ordenarJugadores(idPartida);
+
+	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
+		Jugador jugador = listaPartidas.partidas[idPartida].jugadores[i];
+		if(jugador.tiempoFinal != -1){
+			sprintf(query, "INSERT INTO Jug_Part (Jugador, Partida, Tiempo, Posicion) VALUES ( (SELECT ID FROM Jugador WHERE Usuario=\"%s\"), %d, %f, %d);",
+			jugador.nombre, idPartidaBD, jugador.tiempoFinal, jugador.posicion);
+		}
+	}
+}
+
 void acabarCarrera(char *response, int sock_conn){
 	int idPartida = atoi(strtok(NULL, "/"));
 	char nombreUsuario[50];
@@ -454,7 +502,7 @@ void acabarCarrera(char *response, int sock_conn){
 		} 
 	}
 
-	char notificacion[50];
+	char notificacion[200];
 	sprintf(notificacion, "18/%s/%f/%f", nombreUsuario, tiempo, mejorTiempo);
 
 	//envía una notificación a todos los jugadores
@@ -478,30 +526,6 @@ void acabarCarrera(char *response, int sock_conn){
 
 }
 
-void ordenarJugadores(){
-	//TODO ordenar jugadores
-}
-
-void acabarPartida(int idPartida){
-	char query[500];
-	sprintf(query, "INSERT INTO Partidas (HFin) VALUES (NOW());");
-	mysql_query(conn, query);
-
-	sprintf(query, "SELECT LAST_INSERT_ID();");
-	resultado = mysql_store_result (conn);
-	row = mysql_fetch_row (resultado);
-	int idPartidaBD = atoi(row[0]);
-
-	ordenarJugadores();
-
-	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
-		Jugador jugador = listaPartidas.partidas[idPartida].jugadores[i];
-		if(jugador.tiempoFinal != -1){
-			sprintf(query, "INSERT INTO Jug_Part (Jugador, Partida, Tiempo, Posicion) VALUES ( (SELECT ID FROM Jugador WHERE Usuario=\"%s\"), %d, %f, %d);",
-			jugador.nombre, idPartidaBD, jugador.tiempoFinal, jugador.posicion);
-		}
-	}
-}
 
 
 
@@ -563,6 +587,7 @@ void *atenderCliente(void *socket){
 		
 		//imprimeix el buffer al socket i tanca'l
 		//la resposta només s'envia si el codi del missatge no és 0
+		if(DEBUG) printf("Respuesta enviada: %s\n", buff2);
 		sprintf(buff2, "%s\n", buff2);	//afegeix un salt de línia per indicar final del missatge
 		write(sock_conn,buff2, strlen(buff2));
 		//printf("Respuesta enviada!: %s", buff2);	//no cal fer un altre salt de línia, buff2 sempre acaba en un
