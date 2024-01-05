@@ -26,6 +26,8 @@ typedef struct{
 	double y;
 	double rot;
 	double tiempoFinal;
+	int coche;
+	int posicion;
 }Jugador;
 typedef struct{
 	Jugador jugadores[20];
@@ -222,86 +224,6 @@ void existeUsuario(char *response){
 }
 
 
-/*******************************************
-Funciones de respuestas de consultas básicas
-*******************************************/
-void consultaBasicaConstrucciones(char *response){
-	char construccion[50];
-	strcpy(construccion, strtok(NULL, "/"));
-	char query[500];
-	sprintf(query, "SELECT Partidas.ID, Part_Const.X, Part_Const.Y FROM (Construcciones, Partidas, Part_Const) "
-			"WHERE Construcciones.nombre = '%s' "
-			"AND Construcciones.ID = Part_Const.ID_Const "
-			"AND Partidas.ID = Part_Const.ID_Part;", construccion);
-	int err = mysql_query(conn, query);
-	if(err != 0){
-		sprintf(response, "4/-1");
-	}else{
-		resultado = mysql_store_result (conn);
-		row = mysql_fetch_row(resultado);
-		if(row == NULL){
-			sprintf(response, "4/0");
-		}else{
-			sprintf(response, "4/%s/%s/%s", row[0], row[1], row[2]);
-			row = mysql_fetch_row (resultado);
-			while(row != NULL){
-				sprintf(response, "%s/%s/%s/%s", response, row[0], row[1], row[2]);
-				row = mysql_fetch_row (resultado);
-			}
-			printf("%s\n", response);
-		}
-	}
-}
-
-void consultaBasicaDinero(char *response){
-	char nombre[80];
-	char *token=strtok(NULL,"/");
-	strcpy(nombre,token);
-	char query1[500];
-	sprintf(query1, "SELECT Jug_Part.Dinero FROM (Jugador, Partidas,Jug_Part) WHERE Jugador.Usuario = '%s' AND Jugador.ID = Jug_Part.Jugador AND Partidas.ID = Jug_Part.Partida;", nombre);
-	int result = mysql_query(conn, query1);
-	if(result != 0){
-		sprintf(response, "5/-1");
-	}
-	else{
-		resultado = mysql_store_result (conn);
-		row = mysql_fetch_row (resultado);
-		if (row == NULL)
-			sprintf(response,"5/-2");
-		else{
-			int dtotal=0;
-			while(row!=NULL){
-				dtotal += atoi(row[0]);
-				row = mysql_fetch_row (resultado);
-			}
-			sprintf(response,"5/%d",dtotal);
-		}
-	}
-}
-
-void consultaBasicaLogros(char *response){
-	char query[500];
-	sprintf(query, "SELECT Jugador.Usuario, Logros.descripcion FROM (Jugador, Logros, Jug_Log) WHERE Jug_Log.logro_obtenido = 'yes' AND Jug_Log.recompensa_obtenida = 'no' AND Jugador.ID = Jug_Log.ID_Jugadores AND Logros.ID = Jug_Log.ID_Logro;");
-	int err = mysql_query(conn, query);
-	if(err != 0){
-		sprintf(response, "6/-1");
-	}else{
-		resultado = mysql_store_result (conn);
-		row = mysql_fetch_row(resultado);
-		if(row == NULL){
-			sprintf(response, "6/0");
-		}else{
-			sprintf(response, "6/%s/%s", row[0], row[1]);
-			row = mysql_fetch_row (resultado);
-			while(row != NULL){
-				sprintf(response, "%s/%s/%s", response, row[0], row[1]);
-				row = mysql_fetch_row (resultado);
-			}
-			printf("%s\n", response);
-		}
-	}
-}
-
 
 void invitacionJugadores(char *response, int socketOrigen) {
 	int numInvitados;
@@ -334,6 +256,8 @@ void invitacionJugadores(char *response, int socketOrigen) {
 			listaPartidas.partidas[idPartida].jugadores[numJugador].rot = 180;
 			listaPartidas.partidas[idPartida].jugadores[numJugador].aceptado = 0;
 			listaPartidas.partidas[idPartida].jugadores[numJugador].tiempoFinal = -1;
+			listaPartidas.partidas[idPartida].jugadores[numJugador].coche = 0;
+			listaPartidas.partidas[idPartida].jugadores[numJugador].posicion = 0;
 			listaPartidas.partidas[idPartida].numJugadores++;
 
 			//enviar notificación al jugador
@@ -454,6 +378,7 @@ void actualizarPosicion(char *response, int sock_conn){
 	double x = atof(strtok(NULL, "/"));
 	double y = atof(strtok(NULL, "/"));
 	double rot = atof(strtok(NULL, "/"));
+	int coche = atoi(strtok(NULL, "/"));
 
 	sprintf(response, "14");
 	if(idPartida == -1) return;
@@ -464,13 +389,15 @@ void actualizarPosicion(char *response, int sock_conn){
 			listaPartidas.partidas[idPartida].jugadores[i].x = x;
 			listaPartidas.partidas[idPartida].jugadores[i].y = y;
 			listaPartidas.partidas[idPartida].jugadores[i].rot = rot;
+			listaPartidas.partidas[idPartida].jugadores[i].coche = coche;
 		}else{
 			//para los demás jugadores, añadimos su nombre y posicion a la respuesta
-			sprintf(response, "%s/%s/%f/%f/%f", response, 
+			sprintf(response, "%s/%s/%f/%f/%f/%d", response, 
 				listaPartidas.partidas[idPartida].jugadores[i].nombre,
 				listaPartidas.partidas[idPartida].jugadores[i].x,
 				listaPartidas.partidas[idPartida].jugadores[i].y,
-				listaPartidas.partidas[idPartida].jugadores[i].rot);
+				listaPartidas.partidas[idPartida].jugadores[i].rot,
+				listaPartidas.partidas[idPartida].jugadores[i].coche);
 		}
 	}
 }
@@ -539,6 +466,41 @@ void acabarCarrera(char *response, int sock_conn){
 		if (n != -1) write(listaConectados.conectados[n].socket, notificacion, strlen(notificacion));
 	}
 
+	//comprueba si todos los jugadores han acabado
+	char partidaTerminada = 1;
+	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
+		if(listaPartidas.partidas[idPartida].jugadores[i].tiempoFinal == -1) partidaTerminada = 0;
+	}
+	if(!partidaTerminada) return;
+
+	//si la partida está terminada, guárdala en la base de datos
+	acabarPartida(idPartida);
+
+}
+
+void ordenarJugadores(){
+	//TODO ordenar jugadores
+}
+
+void acabarPartida(int idPartida){
+	char query[500];
+	sprintf(query, "INSERT INTO Partidas (HFin) VALUES (NOW());");
+	mysql_query(conn, query);
+
+	sprintf(query, "SELECT LAST_INSERT_ID();");
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+	int idPartidaBD = atoi(row[0]);
+
+	ordenarJugadores();
+
+	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
+		Jugador jugador = listaPartidas.partidas[idPartida].jugadores[i];
+		if(jugador.tiempoFinal != -1){
+			sprintf(query, "INSERT INTO Jug_Part (Jugador, Partida, Tiempo, Posicion) VALUES ( (SELECT ID FROM Jugador WHERE Usuario=\"%s\"), %d, %f, %d);",
+			jugador.nombre, idPartidaBD, jugador.tiempoFinal, jugador.posicion);
+		}
+	}
 }
 
 
@@ -581,32 +543,21 @@ void *atenderCliente(void *socket){
 			signup(buff2);
 		}else if(codigo == 3){
 			existeUsuario(buff2);
-		}else if(codigo == 4){
-			consultaBasicaConstrucciones(buff2);
-		}else if(codigo == 5){
-			consultaBasicaDinero(buff2);
-		}else if(codigo==6){
-			consultaBasicaLogros(buff2);
-		}
-		else if(codigo==8) {
+		}else if(codigo==7){
+			enviarConectados();
+		}else if(codigo==8) {
 			invitacionJugadores(buff2, sock_conn);
-		}
-		else if(codigo==10){
+		}else if(codigo==10){
 			aceptarInvitacion(buff2,sock_conn);
-		}
-		else if(codigo==12){
+		}else if(codigo==12){
 			enviarFrase(buff2,sock_conn);
-		}
-		else if(codigo==14){
+		}else if(codigo==14){
 			actualizarPosicion(buff2, sock_conn);
-		}
-		else if(codigo==15){
+		}else if(codigo==15){
 			iniciarPartida(buff2, sock_conn);
-		}
-		else if(codigo=17){
+		}else if(codigo=17){
 			acabarCarrera(buff2, sock_conn);
-		}
-		else{
+		}else{
 			continue;
 		}
 		
