@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 typedef struct{
 	char nombre [50];
@@ -239,6 +239,13 @@ void invitacionJugadores(char *response, int socketOrigen) {
 	
 	int idPartida = listaPartidas.numPartidas;
 	strcpy(listaPartidas.partidas[idPartida].jugadores[0].nombre, nombreInvitador);
+	listaPartidas.partidas[idPartida].jugadores[0].x = 0;
+	listaPartidas.partidas[idPartida].jugadores[0].y = 0;
+	listaPartidas.partidas[idPartida].jugadores[0].rot = 180;
+	listaPartidas.partidas[idPartida].jugadores[0].aceptado = 0;
+	listaPartidas.partidas[idPartida].jugadores[0].tiempoFinal = -1;
+	listaPartidas.partidas[idPartida].jugadores[0].coche = 0;
+	listaPartidas.partidas[idPartida].jugadores[0].posicion = 0;
 	listaPartidas.partidas[idPartida].numJugadores = 1;
 	listaPartidas.numPartidas++;
 
@@ -465,6 +472,8 @@ void ordenarJugadores(int idPartida){
 }
 
 void acabarPartida(int idPartida){
+	printf("Todos los jugadores de la partida %d han terminado, guardando en base de datos.\n", idPartida);
+
 	char query[500];
 	sprintf(query, "INSERT INTO Partidas (HFin) VALUES (NOW());");
 	mysql_query(conn, query);
@@ -479,9 +488,10 @@ void acabarPartida(int idPartida){
 
 	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
 		Jugador jugador = listaPartidas.partidas[idPartida].jugadores[i];
-		if(jugador.tiempoFinal != -1){
+		if(jugador.tiempoFinal >= 0){
 			sprintf(query, "INSERT INTO Jug_Part (Jugador, Partida, Tiempo, Posicion) VALUES ( (SELECT ID FROM Jugador WHERE Usuario=\"%s\"), %d, %f, %d);",
 			jugador.nombre, idPartidaBD, jugador.tiempoFinal, jugador.posicion);
+			mysql_query(conn, query);
 		}
 	}
 }
@@ -490,9 +500,10 @@ void acabarCarrera(char *response, int sock_conn){
 	int idPartida = atoi(strtok(NULL, "/"));
 	char nombreUsuario[50];
 	strcpy(nombreUsuario, strtok(NULL, "/"));
-	float tiempo = atof(strtok(NULL, "/"));
-	float mejorTiempo = atof(strtok(NULL, "/"));
+	double tiempo = atof(strtok(NULL, "/"));
+	double mejorTiempo = atof(strtok(NULL, "/"));
 	
+	printf("El jugador %s de la partida %d ha acabado la carrera con un tiempo %f\n", nombreUsuario, idPartida, mejorTiempo);
 	sprintf(response, "17/1");
 
 	//busca el jugador y añade su tiempo final
@@ -515,11 +526,10 @@ void acabarCarrera(char *response, int sock_conn){
 	}
 
 	//comprueba si todos los jugadores han acabado
-	char partidaTerminada = 1;
 	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
-		if(listaPartidas.partidas[idPartida].jugadores[i].tiempoFinal == -1) partidaTerminada = 0;
+		// si un jugador tiene tiempo -1 es que no ha acabado.
+		if(listaPartidas.partidas[idPartida].jugadores[i].tiempoFinal < 0) return;
 	}
-	if(!partidaTerminada) return;
 
 	//si la partida está terminada, guárdala en la base de datos
 	acabarPartida(idPartida);
