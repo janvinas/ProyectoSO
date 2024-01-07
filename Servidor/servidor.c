@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 typedef struct{
 	char nombre [50];
@@ -47,8 +47,10 @@ MYSQL *conn;
 MYSQL_RES *resultado;
 MYSQL_ROW row;
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 ListaConectados listaConectados;
+
+pthread_mutex_t conectados_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t partidas_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 /*********************************************
@@ -149,7 +151,7 @@ void login(char *response, int socket, ListaConectados *lista){
 	char password[50];
 	strcpy(password, strtok(NULL, "/"));
 	char query[500];
-	sprintf(query, "SELECT Usuario FROM Jugador WHERE Usuario='%s' AND Password='%s'", nombre, password);
+	sprintf(query, "SELECT Usuario FROM Jugador WHERE Usuario=CAST('%s' AS BINARY) AND Password=CAST('%s' AS BINARY);", nombre, password);
 	int result = mysql_query(conn, query);
 	if(result != 0){
 		sprintf(response, "1/-1");
@@ -180,7 +182,7 @@ void signup(char *response){
 	
 	
 	char query1[500];
-	sprintf(query1, "SELECT Usuario FROM Jugador WHERE Usuario='%s'", nombre);
+	sprintf(query1, "SELECT Usuario FROM Jugador WHERE Usuario=CAST('%s' AS BINARY);", nombre);
 	int result = mysql_query(conn, query1);
 	if(result != 0){
 		sprintf(response, "2/-1");
@@ -208,7 +210,7 @@ void existeUsuario(char *response){
 	char nombre[40];
 	strcpy(nombre, strtok(NULL, "/"));
 	char query[500];
-	sprintf(query, "SELECT Usuario FROM Jugador WHERE Usuario='%s'", nombre);
+	sprintf(query, "SELECT Usuario FROM Jugador WHERE Usuario=CAST('%s' AS BINARY);", nombre);
 	int result = mysql_query(conn, query);
 	if(result != 0){
 		sprintf(response, "3/-1");
@@ -494,6 +496,19 @@ void acabarPartida(int idPartida){
 			mysql_query(conn, query);
 		}
 	}
+
+	char notificacion[50];
+	sprintf(notificacion, "19/");
+
+	//envía una notificación a todos los jugadores anunciando que la partida ha terminado
+	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
+		char jugadorActual[50];
+		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
+		int n = DamePosicion(&listaConectados, jugadorActual);
+
+		if (n != -1) write(listaConectados.conectados[n].socket, notificacion, strlen(notificacion));
+	}
+
 }
 
 void acabarCarrera(char *response, int sock_conn){
@@ -534,6 +549,71 @@ void acabarCarrera(char *response, int sock_conn){
 	//si la partida está terminada, guárdala en la base de datos
 	acabarPartida(idPartida);
 
+}
+
+/**
+ * Consulta contra qué jugadores he jugado una partida.
+ */
+void consultaJugadores(char *response){
+	char jugador[50];
+	strcpy(jugador, strtok(NULL, "/"));
+
+	char query [500];
+	sprintf(query, "SELECT DISTINCT Jugador.Usuario FROM (Jugador, Partidas, Jug_Part) WHERE Jugador.ID = Jug_Part.Jugador AND Partidas.ID = Jug_Part.Partida AND Partidas.ID IN (SELECT Partidas.ID FROM (Partidas, Jug_Part, Jugador) WHERE Jug_Part.Jugador = Jugador.ID AND Jug_Part.Partida = Partidas.ID AND Jugador.Usuario = '%s') AND Jugador.Usuario != '%s';", jugador, jugador);	
+	mysql_query(conn, query);
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+
+	if(row == NULL){
+		sprintf(response, "20/0");
+		return;
+	}
+
+	sprintf(response, "20");
+	while(row != NULL){
+		sprintf(response, "%s/%s", response, row[0]);
+		row = mysql_fetch_row (resultado);
+	}
+}
+
+void consultaResultados(char *response){
+	char jugadorL[50];
+	strcpy(jugadorL, strtok(NULL, "/"));
+	char jugadorV[50];
+	strcpy(jugadorV, strtok(NULL, "/"));
+
+	char query [1000];
+	sprintf(query, "SELECT Jug_Part.Partida, Jugador.Usuario, Jug_Part.Tiempo, Jug_Part.Posicion "
+			"FROM Jugador "
+			"JOIN Jug_Part ON Jugador.ID = Jug_Part.Jugador "
+			"WHERE Jug_Part.Partida IN ("
+    			"SELECT Jug_Part.Partida "
+    			"FROM Jugador "
+    			"JOIN Jug_Part ON Jugador.ID = Jug_Part.Jugador "
+    			"WHERE Jugador.Usuario = '%s'"
+			") "
+			"AND Jug_Part.Partida IN ("
+    			"SELECT Jug_Part.Partida "
+    			"FROM Jugador "
+    			"JOIN Jug_Part ON Jugador.ID = Jug_Part.Jugador "
+    			"WHERE Jugador.Usuario = '%s'"
+			") ORDER BY Jug_Part.Partida ASC, Jug_Part.Posicion ASC;", jugadorL, jugadorV);
+
+	int res = mysql_query(conn, query);
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+
+	if(row == NULL){
+		sprintf(response, "21/0");
+		return;
+	}
+
+	sprintf(response, "21");
+	while(row != NULL){
+		sprintf(response, "%s/%s/%s/%s/%s", response, row[0], row[1], row[2], row[3]);
+		row = mysql_fetch_row (resultado);
+	}
+	
 }
 
 
@@ -589,9 +669,14 @@ void *atenderCliente(void *socket){
 			actualizarPosicion(buff2, sock_conn);
 		}else if(codigo==15){
 			iniciarPartida(buff2, sock_conn);
-		}else if(codigo=17){
+		}else if(codigo==17){
 			acabarCarrera(buff2, sock_conn);
-		}else{
+		}else if(codigo==20){
+			consultaJugadores(buff2);
+		}else if(codigo == 21){
+			consultaResultados(buff2);
+		}
+		else{
 			continue;
 		}
 		
