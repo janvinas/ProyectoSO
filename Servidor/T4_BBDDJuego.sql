@@ -7,7 +7,7 @@ CREATE TABLE Jugador(
 	Password TEXT NOT NULL,
 	Mail TEXT NOT NULL,
 	Genero CHAR NOT NULL,
-	XP INTEGER NOT NULL,
+	Experiencia INTEGER NOT NULL
 );
 
 CREATE TABLE Partidas(
