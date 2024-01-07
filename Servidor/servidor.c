@@ -49,8 +49,7 @@ MYSQL_ROW row;
 
 ListaConectados listaConectados;
 
-pthread_mutex_t conectados_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t partidas_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 /*********************************************
@@ -58,17 +57,17 @@ Funciones que gestionan la lista de conectados
 **********************************************/
 
 int addConectado (ListaConectados *lista, char nombre[50], int socket) {
-	pthread_mutex_lock(&conectados_mutex);
 	if (lista -> num == 100){
 		return -1;
 	}
 	else {
+		pthread_mutex_lock(&mutex);
 		strcpy(lista -> conectados[lista -> num].nombre, nombre);
 		lista -> conectados[lista->num].socket = socket;
 		lista -> num++;
+		pthread_mutex_unlock(&mutex);
 		return 0;
 	}
-	pthread_mutex_unlock(&conectados_mutex);
 }
 
 int DameNombre (ListaConectados *lista, int socket, char nombre[50]) {
@@ -105,22 +104,21 @@ int DamePosicion (ListaConectados *lista, char nombre[50]) {
 	
 int eliminarConectado (ListaConectados *lista, char nombre[50])
 {
-	pthread_mutex_lock(&conectados_mutex);
 	int pos = DamePosicion (lista, nombre);
 	if (pos == -1)
 		return -1;
 	else {
-
+		pthread_mutex_lock(&mutex);
 		for (int i = pos; i < lista -> num-1; i++)
 		{
 			strcpy(lista -> conectados[i].nombre, lista -> conectados[i+1].nombre);
 			lista -> conectados[i].socket = lista -> conectados[i+1].socket;
 		}
 		lista->num = lista->num-1;
+		pthread_mutex_unlock(&mutex);
 		return 0;
 	
 	}
-	pthread_mutex_unlock(&conectados_mutex);
 }
 
 void DameConectados(ListaConectados * lista, char conectados[300]) {
@@ -196,7 +194,7 @@ void signup(char *response){
 		row = mysql_fetch_row (resultado);
 		if (row == NULL){
 			char query2[500];
-			sprintf(query2, "INSERT INTO Jugador (Usuario, Password, Mail, Genero) VALUES ('%s', '%s', '%s', '%c');", nombre, password, email, genero);
+			sprintf(query2, "INSERT INTO Jugador (Usuario, Password, Mail, Genero, Experiencia) VALUES ('%s', '%s', '%s', '%c', %d);", nombre, password, email, genero, 0);
 			result = mysql_query(conn, query2);
 			printf("%s\n",query2);
 			if(result != 0){
@@ -244,7 +242,7 @@ void invitacionJugadores(char *response, int socketOrigen) {
 	DameNombre(&listaConectados, socketOrigen, nombreInvitador);
 	
 	int idPartida = listaPartidas.numPartidas;
-	pthread_mutex_lock(&partidas_mutex);
+	pthread_mutex_lock(&mutex);
 	strcpy(listaPartidas.partidas[idPartida].jugadores[0].nombre, nombreInvitador);
 	listaPartidas.partidas[idPartida].jugadores[0].x = 0;
 	listaPartidas.partidas[idPartida].jugadores[0].y = 0;
@@ -255,7 +253,7 @@ void invitacionJugadores(char *response, int socketOrigen) {
 	listaPartidas.partidas[idPartida].jugadores[0].posicion = 0;
 	listaPartidas.partidas[idPartida].numJugadores = 1;
 	listaPartidas.numPartidas++;
-	pthread_mutex_unlock(&partidas_mutex);
+	pthread_mutex_unlock(&mutex);
 
 	sprintf(response, "8/%d", idPartida); // se envía de vuelta el ID de partida
 	
@@ -289,7 +287,7 @@ void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptad
 
 	//añadir jugador a la lista de partidas
 	int numJugador = listaPartidas.partidas[idPartida].numJugadores;
-	pthread_mutex_lock(&partidas_mutex);
+	pthread_mutex_lock(&mutex);
 	strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, listaConectados.conectados[numJugador].nombre);
 	listaPartidas.partidas[idPartida].jugadores[numJugador].x = 0;
 	listaPartidas.partidas[idPartida].jugadores[numJugador].y = 0;
@@ -299,7 +297,7 @@ void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptad
 	listaPartidas.partidas[idPartida].jugadores[numJugador].coche = 0;
 	listaPartidas.partidas[idPartida].jugadores[numJugador].posicion = 0;
 	listaPartidas.partidas[idPartida].numJugadores++;
-	pthread_mutex_unlock(&partidas_mutex);
+	pthread_mutex_unlock(&mutex);
 
 	DameNombre(&listaConectados, socketOrigen, personaAceptado);
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
@@ -307,9 +305,9 @@ void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptad
 		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
 
 		if(strcmp(personaAceptado, jugadorActual) == 0){
-			pthread_mutex_lock(&partidas_mutex);
+			pthread_mutex_lock(&mutex);
 			listaPartidas.partidas[idPartida].jugadores[i].aceptado = aceptado;
-			pthread_mutex_unlock(&partidas_mutex);
+			pthread_mutex_unlock(&mutex);
 		}
 		else if(aceptado){
 			sprintf(mensaje, "11/%d/%s\n",idPartida, personaAceptado);
@@ -407,7 +405,7 @@ void actualizarPosicion(char *response, int sock_conn){
 	sprintf(response, "14");
 	if(idPartida == -1) return;
 
-	pthread_mutex_lock(&partidas_mutex);
+	pthread_mutex_lock(&mutex);
 	for(int i = 0; i < listaPartidas.partidas[idPartida].numJugadores; i++){
 		if(strcmp(listaPartidas.partidas[idPartida].jugadores[i].nombre, nombreUsuario) == 0){
 			//jugador que ha mandado su posición. La actualizamos
@@ -425,7 +423,7 @@ void actualizarPosicion(char *response, int sock_conn){
 				listaPartidas.partidas[idPartida].jugadores[i].coche);
 		}
 	}
-	pthread_mutex_unlock(&partidas_mutex);
+	pthread_mutex_unlock(&mutex);
 }
 
 void iniciarPartida(char *response, int sock_conn){
@@ -465,7 +463,7 @@ void iniciarPartida(char *response, int sock_conn){
 }
 
 void ordenarJugadores(int idPartida){
-	pthread_mutex_lock(&partidas_mutex);
+	pthread_mutex_lock(&mutex);
 	// reparte tantas posiciones como jugadores haya en la partida
 	for(int posicion = 1; posicion <= listaPartidas.partidas[idPartida].numJugadores; posicion++){
 
@@ -487,7 +485,7 @@ void ordenarJugadores(int idPartida){
 		}
 	}
 
-	pthread_mutex_unlock(&partidas_mutex);
+	pthread_mutex_unlock(&mutex);
 
 }
 
@@ -550,14 +548,14 @@ void acabarCarrera(char *response, int sock_conn){
 	printf("El jugador %s de la partida %d ha acabado la carrera con un tiempo %f\n", nombreUsuario, idPartida, mejorTiempo);
 	sprintf(response, "17/1");
 
-	pthread_mutex_lock(&partidas_mutex);
+	pthread_mutex_lock(&mutex);
 	//busca el jugador y añade su tiempo final
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
 		if(strcmp(listaPartidas.partidas[idPartida].jugadores[i].nombre, nombreUsuario) == 0){
 			listaPartidas.partidas[idPartida].jugadores[i].tiempoFinal = tiempo;
 		} 
 	}
-	pthread_mutex_unlock(&partidas_mutex);
+	pthread_mutex_unlock(&mutex);
 
 	char notificacion[200];
 	sprintf(notificacion, "18/%s/%f/%f", nombreUsuario, tiempo, mejorTiempo);
