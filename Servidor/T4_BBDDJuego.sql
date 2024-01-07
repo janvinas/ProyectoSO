@@ -6,7 +6,8 @@ CREATE TABLE Jugador(
 	Usuario TEXT NOT NULL,
 	Password TEXT NOT NULL,
 	Mail TEXT NOT NULL,
-	Genero CHAR NOT NULL
+	Genero CHAR NOT NULL,
+	XP INTEGER NOT NULL,
 );
 
 CREATE TABLE Partidas(
@@ -24,9 +25,9 @@ CREATE TABLE Jug_Part(
 );
 
 
-INSERT INTO Jugador VALUE(1,'PauSerrano','pauserrano','pau.serrano@gmail.com','M');
-INSERT INTO Jugador VALUE(2,'CarlosMunoz','carlosmunoz','carlos.munoz@gmail.com','M');
-INSERT INTO Jugador VALUE(3,'JanVinas','janvinas','jan.vinas@gmail.com','M');
+INSERT INTO Jugador VALUE(1,'PauSerrano','pauserrano','pau.serrano@gmail.com','M', 0);
+INSERT INTO Jugador VALUE(2,'CarlosMunoz','carlosmunoz','carlos.munoz@gmail.com','M', 0);
+INSERT INTO Jugador VALUE(3,'JanVinas','janvinas','jan.vinas@gmail.com','M', 0);
 
 /*
 INSERT INTO Partidas (HFin) VALUES ('2023-09-03 17:09:00');

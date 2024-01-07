@@ -260,18 +260,6 @@ void invitacionJugadores(char *response, int socketOrigen) {
 		int n = DamePosicion(&listaConectados, nombre);
 		if (n != -1)
 		{
-			//añadir jugador a la lista de partidas
-			int numJugador = listaPartidas.partidas[idPartida].numJugadores;
-			strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, listaConectados.conectados[n].nombre);
-			listaPartidas.partidas[idPartida].jugadores[numJugador].x = 0;
-			listaPartidas.partidas[idPartida].jugadores[numJugador].y = 0;
-			listaPartidas.partidas[idPartida].jugadores[numJugador].rot = 180;
-			listaPartidas.partidas[idPartida].jugadores[numJugador].aceptado = 0;
-			listaPartidas.partidas[idPartida].jugadores[numJugador].tiempoFinal = -1;
-			listaPartidas.partidas[idPartida].jugadores[numJugador].coche = 0;
-			listaPartidas.partidas[idPartida].jugadores[numJugador].posicion = 0;
-			listaPartidas.partidas[idPartida].numJugadores++;
-
 			//enviar notificación al jugador
 			sprintf(invitacion, "9/%d/%s\n", idPartida, nombreInvitador);
 			write(listaConectados.conectados[n].socket, invitacion, strlen(invitacion));
@@ -290,6 +278,19 @@ void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptad
 	aceptado = atoi(strtok(NULL, "/"));
 
 	sprintf(response, "10/1");
+
+	//añadir jugador a la lista de partidas
+	int numJugador = listaPartidas.partidas[idPartida].numJugadores;
+	strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, listaConectados.conectados[numJugador].nombre);
+	listaPartidas.partidas[idPartida].jugadores[numJugador].x = 0;
+	listaPartidas.partidas[idPartida].jugadores[numJugador].y = 0;
+	listaPartidas.partidas[idPartida].jugadores[numJugador].rot = 180;
+	listaPartidas.partidas[idPartida].jugadores[numJugador].aceptado = 0;
+	listaPartidas.partidas[idPartida].jugadores[numJugador].tiempoFinal = -1;
+	listaPartidas.partidas[idPartida].jugadores[numJugador].coche = 0;
+	listaPartidas.partidas[idPartida].jugadores[numJugador].posicion = 0;
+	listaPartidas.partidas[idPartida].numJugadores++;
+
 	
 	DameNombre(&listaConectados, socketOrigen, personaAceptado);
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
