@@ -279,6 +279,8 @@ void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptad
 
 	sprintf(response, "10/1");
 
+	if(aceptado == 0) return; 
+
 	//añadir jugador a la lista de partidas
 	int numJugador = listaPartidas.partidas[idPartida].numJugadores;
 	strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, listaConectados.conectados[numJugador].nombre);
@@ -290,7 +292,6 @@ void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptad
 	listaPartidas.partidas[idPartida].jugadores[numJugador].coche = 0;
 	listaPartidas.partidas[idPartida].jugadores[numJugador].posicion = 0;
 	listaPartidas.partidas[idPartida].numJugadores++;
-
 	
 	DameNombre(&listaConectados, socketOrigen, personaAceptado);
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
@@ -495,6 +496,17 @@ void acabarPartida(int idPartida){
 			sprintf(query, "INSERT INTO Jug_Part (Jugador, Partida, Tiempo, Posicion) VALUES ( (SELECT ID FROM Jugador WHERE Usuario=\"%s\"), %d, %f, %d);",
 			jugador.nombre, idPartidaBD, jugador.tiempoFinal, jugador.posicion);
 			mysql_query(conn, query);
+
+			int experiencia;
+			switch(jugador.posicion){
+				case 1: experiencia = 30; break;
+				case 2: experiencia = 15; break;
+				case 3: experiencia = 5;  break;
+				default: experiencia = 0; break;
+			}
+
+			sprintf(query, "UPDATE Jugador SET Experiencia = Experiencia + 1 WHERE Usuario = '%s';", jugador.nombre);
+			mysql_query(conn, query);
 		}
 	}
 
@@ -552,6 +564,27 @@ void acabarCarrera(char *response, int sock_conn){
 
 }
 
+void consultarXP(char *response){
+	char jugador[50];
+	strcpy(jugador, strtok(NULL, "/"));
+	char query [500];
+	sprintf(query, "SELECT Experiencia FROM Jugador WHERE Usuario = '%s';", jugador);	
+	int res = mysql_query(conn, query);
+	if(res != 0){
+		sprintf(response, "23/-1");
+		return;
+	}
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+
+	if(row == NULL){
+		sprintf(response, "23/-1");
+		return;
+	}else{
+		sprintf(response, "23/%s", row[0]);
+	}
+}
+
 /**
  * Consulta contra qué jugadores he jugado una partida.
  */
@@ -561,7 +594,11 @@ void consultaJugadores(char *response){
 
 	char query [500];
 	sprintf(query, "SELECT DISTINCT Jugador.Usuario FROM (Jugador, Partidas, Jug_Part) WHERE Jugador.ID = Jug_Part.Jugador AND Partidas.ID = Jug_Part.Partida AND Partidas.ID IN (SELECT Partidas.ID FROM (Partidas, Jug_Part, Jugador) WHERE Jug_Part.Jugador = Jugador.ID AND Jug_Part.Partida = Partidas.ID AND Jugador.Usuario = '%s') AND Jugador.Usuario != '%s';", jugador, jugador);	
-	mysql_query(conn, query);
+	int res = mysql_query(conn, query);
+	if(res != 0){
+		sprintf(response, "20/0");
+		return;
+	}
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 
@@ -601,6 +638,10 @@ void consultaResultados(char *response){
 			") ORDER BY Jug_Part.Partida ASC, Jug_Part.Posicion ASC;", jugadorL, jugadorV);
 
 	int res = mysql_query(conn, query);
+	if(res != 0){
+		sprintf(response, "21/0");
+		return;
+	}
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 
@@ -615,6 +656,39 @@ void consultaResultados(char *response){
 		row = mysql_fetch_row (resultado);
 	}
 	
+}
+
+void consultaPartidas(char *response){
+	char jugador[50];
+	strcpy(jugador, strtok(NULL,"/"));
+	char fechaInicio[50];
+	strcpy(fechaInicio, strtok(NULL, "/"));
+	char fechaFin[50];
+	strcpy(fechaFin, strtok(NULL, "/"));
+
+
+	char query[500];
+	sprintf(query, "SELECT Jug_Part.Partida, Partidas.HFin, Jug_Part.Tiempo, Jug_Part.Posicion FROM Jug_Part, Jugador, Partidas WHERE Jugador.ID = Jug_Part.Jugador AND Jug_Part.Partida = Partidas.ID AND Jugador.Usuario = '%s' AND Partidas.HFin BETWEEN '%s' AND DATE_ADD('%s', INTERVAL 1 DAY) ORDER BY Partidas.HFin;", jugador, fechaInicio, fechaFin);
+	
+	int res = mysql_query(conn, query);
+	if(res != 0){
+		sprintf(response, "22/0");
+		return;
+	}
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+
+	if(row == NULL){
+		sprintf(response, "22/0");
+		return;
+	}
+
+	sprintf(response, "22");
+	while(row != NULL){
+		sprintf(response, "%s/%s/%s/%s/%s", response, row[0], row[1], row[2], row[3]);
+		row = mysql_fetch_row (resultado);
+	}
+
 }
 
 
@@ -676,8 +750,11 @@ void *atenderCliente(void *socket){
 			consultaJugadores(buff2);
 		}else if(codigo == 21){
 			consultaResultados(buff2);
-		}
-		else{
+		}else if(codigo == 22){
+			consultaPartidas(buff2);
+		}else if(codigo == 23){
+			consultarXP(buff2);
+		}else{
 			continue;
 		}
 		
