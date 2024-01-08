@@ -452,6 +452,7 @@ void iniciarPartida(char *response, int sock_conn){
 	sprintf(notificacion, "16/%s\n", mapa);
 
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
+		listaPartidas.partidas[idPartida].jugadores[i].tiempoFinal = -1;
 		char jugadorActual[50];
 		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
 		int n = DamePosicion(&listaConectados, jugadorActual);
