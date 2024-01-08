@@ -58,3 +58,7 @@ URL: https://youtu.be/21Wd8YD7JdQ?feature=shared
 Versión 6 generada por Pau Serrano
 
 Versión 6 verificada por Jan Viñas
+
+Versión 6 comunicada por Carlos Muñoz
+
+URL: https://youtu.be/22aqpOrsTUw
