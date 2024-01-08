@@ -285,10 +285,12 @@ void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptad
 
 	if(aceptado == 0) return; 
 
+	DameNombre(&listaConectados, socketOrigen, personaAceptado);
+
 	//añadir jugador a la lista de partidas
 	int numJugador = listaPartidas.partidas[idPartida].numJugadores;
 	pthread_mutex_lock(&mutex);
-	strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, listaConectados.conectados[numJugador].nombre);
+	strcpy(listaPartidas.partidas[idPartida].jugadores[numJugador].nombre, personaAceptado);
 	listaPartidas.partidas[idPartida].jugadores[numJugador].x = 0;
 	listaPartidas.partidas[idPartida].jugadores[numJugador].y = 0;
 	listaPartidas.partidas[idPartida].jugadores[numJugador].rot = 180;
@@ -299,7 +301,7 @@ void aceptarInvitacion(char *response, int socketOrigen){ //10/idPartida/aceptad
 	listaPartidas.partidas[idPartida].numJugadores++;
 	pthread_mutex_unlock(&mutex);
 
-	DameNombre(&listaConectados, socketOrigen, personaAceptado);
+	
 	for(int i=0; i<listaPartidas.partidas[idPartida].numJugadores; i++){
 		char jugadorActual[50];
 		strcpy(jugadorActual, listaPartidas.partidas[idPartida].jugadores[i].nombre);
@@ -728,6 +730,7 @@ void *atenderCliente(void *socket){
 	char buff[512]; //petición
 	char buff2[512]; //respuesta
 
+
 	while(1){
 		int ret=read(sock_conn,buff, sizeof(buff));
 		//posa un valor 0 al final per acabar la string
@@ -736,61 +739,77 @@ void *atenderCliente(void *socket){
 		if(ret == 0){
 			//0 bytes significa que el cliente se ha desconectado (equivalente a que mande un código 0/ )
 			desconectarCliente(sock_conn, 1);
-			break;
+			return;
 		}else if(ret < 0){
 			//ha ocurrido un error leyendo el socket. Imprime el error por consola:
 			printf("Ha ocurrido un error leyendo el socket");
-		}
-
-		if(DEBUG) printf("Mensaje recibido!: %s\n", buff);
-
-		char *token = strtok(buff, "/");
-		int codigo = atoi(token);
-
-		if(codigo == 0){
-			desconectarCliente(sock_conn, 0);
-			break;
-		}else if (codigo ==1){
-			login(buff2, sock_conn, &listaConectados);
-		}else if(codigo == 2){
-			signup(buff2);
-		}else if(codigo == 3){
-			existeUsuario(buff2);
-		}else if(codigo==7){
-			enviarConectados();
-		}else if(codigo==8) {
-			invitacionJugadores(buff2, sock_conn);
-		}else if(codigo==10){
-			aceptarInvitacion(buff2,sock_conn);
-		}else if(codigo==12){
-			enviarFrase(buff2,sock_conn);
-		}else if(codigo==14){
-			actualizarPosicion(buff2, sock_conn);
-		}else if(codigo==15){
-			iniciarPartida(buff2, sock_conn);
-		}else if(codigo==17){
-			acabarCarrera(buff2, sock_conn);
-		}else if(codigo==20){
-			consultaJugadores(buff2);
-		}else if(codigo == 21){
-			consultaResultados(buff2);
-		}else if(codigo == 22){
-			consultaPartidas(buff2);
-		}else if(codigo == 23){
-			consultarXP(buff2);
-		}else if(codigo == 24){
-			eliminarUsuario(buff2);
-		}
-		else{
 			continue;
 		}
+
+		char * saveptr = NULL;
+		char * outer_token = strtok_r(buff, "\n", &saveptr);
 		
-		//imprimeix el buffer al socket i tanca'l
-		//la resposta només s'envia si el codi del missatge no és 0
-		if(DEBUG) printf("Respuesta enviada: %s\n", buff2);
-		sprintf(buff2, "%s\n", buff2);	//afegeix un salt de línia per indicar final del missatge
-		write(sock_conn,buff2, strlen(buff2));
-		//printf("Respuesta enviada!: %s", buff2);	//no cal fer un altre salt de línia, buff2 sempre acaba en un
+		while(outer_token != NULL){
+
+			if(strlen(outer_token) <= 0) break;
+
+			char message[512];
+			strcpy(message, outer_token);
+
+			if(DEBUG) printf("Mensaje recibido!: %s\n", buff);
+
+			char *token = strtok(message, "/");
+			int codigo = atoi(token);
+
+			if(codigo == 0){
+				desconectarCliente(sock_conn, 0);
+				return;
+			}else if (codigo ==1){
+				login(buff2, sock_conn, &listaConectados);
+			}else if(codigo == 2){
+				signup(buff2);
+			}else if(codigo == 3){
+				existeUsuario(buff2);
+			}else if(codigo==7){
+				enviarConectados();
+			}else if(codigo==8) {
+				invitacionJugadores(buff2, sock_conn);
+			}else if(codigo==10){
+				aceptarInvitacion(buff2,sock_conn);
+			}else if(codigo==12){
+				enviarFrase(buff2,sock_conn);
+			}else if(codigo==14){
+				actualizarPosicion(buff2, sock_conn);
+			}else if(codigo==15){
+				iniciarPartida(buff2, sock_conn);
+			}else if(codigo==17){
+				acabarCarrera(buff2, sock_conn);
+			}else if(codigo==20){
+				consultaJugadores(buff2);
+			}else if(codigo == 21){
+				consultaResultados(buff2);
+			}else if(codigo == 22){
+				consultaPartidas(buff2);
+			}else if(codigo == 23){
+				consultarXP(buff2);
+			}else if(codigo == 24){
+				eliminarUsuario(buff2);
+			}
+			else{
+				continue;
+			}
+			
+			//imprimeix el buffer al socket i tanca'l
+			//la resposta només s'envia si el codi del missatge no és 0
+			if(DEBUG) printf("Respuesta enviada: %s\n", buff2);
+			sprintf(buff2, "%s\n", buff2);	//afegeix un salt de línia per indicar final del missatge
+			write(sock_conn,buff2, strlen(buff2));
+			//printf("Respuesta enviada!: %s", buff2);	//no cal fer un altre salt de línia, buff2 sempre acaba en un
+
+			outer_token = strtok_r(NULL, "\n", &saveptr);
+		}
+
+		
 	}
 }
 
